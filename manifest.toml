@@ -1,0 +1,15 @@
+# The specification is `open-package spec`, and document/SPEC.md is normative.
+
+[open-package]
+version = "1.0.0"
+
+[package]
+name = "open-package"
+version = "1.0.0"
+description = "The open-package specification, and the runner every package is read by"
+requires = ["swift", "sh"]
+
+[command]
+build = "sh source/build.sh"
+test = "swift test --package-path source/open-package"
+verify = "swift run --package-path source/open-package OpenPackage check && swift test --package-path source/open-package"
