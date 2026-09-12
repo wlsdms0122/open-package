@@ -18,10 +18,10 @@ struct PackageDirectory: Sendable {
     }
 
     // MARK: - Public
-    /// The only way in. A runner that cannot speak for the package does nothing, so there
+    /// The only way in. A runner that does not support the package does nothing, so there
     /// is deliberately no ungated read here for a caller to reach for by mistake.
-    func speakableManifest() throws -> Manifest {
-        try ManifestLoader(url: root.appendingPathComponent(PackageLayout.manifest)).loadSpeakable()
+    func manifest() throws -> Manifest {
+        try ManifestLoader(url: root.appendingPathComponent(PackageLayout.manifest)).loadSupported()
     }
 
     // MARK: - Private

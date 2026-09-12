@@ -20,20 +20,19 @@ public struct Manifest: Sendable {
     public let commands: [Command]
 
     // MARK: - Initializer
-    /// A field written as something other than a string is refused, not rendered as one.
-    /// A missing field is left empty instead, because whether it had to be there is the
+    /// A field written as something other than a string is refused, not rendered as one. A
+    /// missing field is left empty instead, since whether it had to be there is the
     /// specification's question and `check` is where it is asked.
     ///
-    /// `[open-package] version` is the exception, and is read as a version here. It is the
-    /// field that decides whether the rest may be read at all, so a manifest that cannot
-    /// say which open-package it is written for is not one yet. A version held as text is
-    /// also a version parsed again at every place that compares it.
+    /// `[open-package] version` is the exception and is read as a version here. It decides
+    /// whether the rest may be read at all, so a manifest that cannot say which open-package
+    /// it is written for is not one yet.
     init(document: TOMLDocument) throws {
         guard let declared = try document.string("open-package.version") else {
-            throw ManifestError.undeclaredRequirement
+            throw ManifestError.undeclaredRunnerVersion
         }
         guard let required = Version(declared) else {
-            throw ManifestError.unreadableRequirement(declared)
+            throw ManifestError.unreadableRunnerVersion(declared)
         }
 
         self.requiredRunner = required

@@ -7,11 +7,9 @@
 
 import Foundation
 
-/// Reads the package around a place and judges it against the specification.
-///
-/// Finding it is part of the work rather than something asked of the caller. A runner is
-/// invoked from wherever a person happens to stand, and the walk upward is what turns that
-/// into one answer.
+/// Reads the package around a place and judges it against the specification. Finding the
+/// package is part of the work rather than something asked of the caller, since a runner is
+/// invoked from wherever a person happens to stand.
 public struct InspectionRunner: Sendable {
     // MARK: - Property
     private let origin: URL
@@ -24,7 +22,7 @@ public struct InspectionRunner: Sendable {
     // MARK: - Public
     public func run() throws -> Inspection {
         let directory = try PackageLocator(origin: origin).package()
-        let manifest = try directory.speakableManifest()
+        let manifest = try directory.manifest()
 
         return Inspection(
             manifest: manifest,

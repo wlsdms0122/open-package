@@ -7,20 +7,18 @@
 
 import Foundation
 
-/// Why the file that should say what this package is cannot be taken as it stands. They
-/// are ordered by how far reading got: no file, no text, no TOML, no stated open-package,
-/// and one this runner cannot speak for. They are kept apart because each sends the reader
-/// somewhere else to fix it.
+/// Why the file that should say what this package is cannot be taken as it stands, ordered
+/// by how far reading got: no file, no text, no TOML, no stated open-package, and one this
+/// runner does not support. Each sends the reader somewhere else to fix it.
 ///
-/// The last is not the manifest being wrong; it is this binary being the wrong one to read
-/// it. It sits here because the gate is passed on the way to a manifest, and a requirement
-/// that is absent, unreadable or too new is one question asked three times.
+/// The last one is this binary being the wrong one to read the manifest rather than the
+/// manifest being wrong. It sits here because the gate is passed on the way to a manifest.
 public enum ManifestError: Error, CustomStringConvertible, Sendable {
     case unreadable(URL, reason: String)
     case malformed(TOMLError)
-    case undeclaredRequirement
-    case unreadableRequirement(String)
-    case unspeakableRequirement(required: Version)
+    case undeclaredRunnerVersion
+    case unreadableRunnerVersion(String)
+    case unsupportedRunnerVersion(required: Version)
 
     // MARK: - Property
     public var description: String {
@@ -33,16 +31,16 @@ public enum ManifestError: Error, CustomStringConvertible, Sendable {
         case let .malformed(error):
             return "\(PackageLayout.manifest) \(error.description)"
 
-        case .undeclaredRequirement:
+        case .undeclaredRunnerVersion:
             return """
                 \(PackageLayout.manifest) has no [open-package] version. \
                 A package must state which open-package it is written for.
                 """
 
-        case let .unreadableRequirement(text):
+        case let .unreadableRunnerVersion(text):
             return "[open-package] version is not a version: \(text)"
 
-        case let .unspeakableRequirement(required):
+        case let .unsupportedRunnerVersion(required):
             return """
                 this package is written for open-package \(required), and this is \(Environment.version).
                 \(required > Environment.version ? "Update the runner." : "Use the runner the package was written for.")

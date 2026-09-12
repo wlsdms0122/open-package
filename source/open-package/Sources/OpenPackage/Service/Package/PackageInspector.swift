@@ -73,7 +73,7 @@ struct PackageInspector: Sendable {
         }
     }
 
-    /// Command names are not read here, only bodies. Which words a package spends is its
+    /// Command names are not read here, only bodies. Which words a package uses is its
     /// own affair: the specification fixes no name, so there is no meaning here to hold a
     /// line to, and which names a runner has already taken is a fact about that runner's
     /// surface rather than about the format. What is left is the one thing a manifest can

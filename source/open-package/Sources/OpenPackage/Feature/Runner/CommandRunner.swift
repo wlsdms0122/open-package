@@ -25,7 +25,7 @@ public struct CommandRunner: Sendable {
     /// whichever surface happened to ask.
     public func run(_ name: String, arguments: [String]) throws -> Int32 {
         let directory = try PackageLocator(origin: origin).package()
-        let manifest = try directory.speakableManifest()
+        let manifest = try directory.manifest()
 
         guard let command = manifest.command(named: name) else {
             throw RunnerError.unknownCommand(name)

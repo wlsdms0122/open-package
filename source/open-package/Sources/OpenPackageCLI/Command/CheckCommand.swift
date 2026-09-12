@@ -59,7 +59,7 @@ struct CheckCommand: ParsableCommand {
             "\(manifest.name): \(diagnosis.errors.count) error · \(diagnosis.warnings.count) warn"
         )
 
-        guard diagnosis.isSound else {
+        guard diagnosis.isValid else {
             throw ExitCode.failure
         }
     }
