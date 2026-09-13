@@ -28,7 +28,7 @@ verify = "sh source/verify.sh"
 |---|---|---|
 | `version` | **required** | The open-package this package is written for |
 
-Write the least version whose behaviour the package needs, not the version of the runner that wrote the file. Section 4 of `SPEC.md` says which runners then speak for the package.
+Write the least version whose behaviour the package needs, not the version of the runner that wrote the file. Section 4 of `SPEC.md` says which runners then support the package.
 
 ## `[package]`
 
@@ -72,11 +72,11 @@ The rule is one sentence: **if the line contains `$@`, the runner appends nothin
 
 A body that runs nothing, whether spaces, tabs or an escaped newline, is an error and not a warning.
 
-Two kinds of name are not reached by the short form: those the runner answers itself, and anything beginning with `-`. Neither is lost: `run <name>` reaches any name a manifest states (`SPEC.md` rule 3.5).
+Two kinds of name are not reached by the short form: those the runner answers itself, and anything beginning with `-`. Neither is lost: `run <name>` reaches any name a manifest states, and `run -- <name>` reaches one beginning with `-` (`SPEC.md` rule 3.5).
 
 ## What a command does
 
-There is no `[help]` table. `open-package` with no arguments lists each name and the line it runs, which is what will actually happen:
+There is no `[help]` table. `open-package` with no arguments lists each name and the line it runs, and that line is what will actually happen:
 
 ```
 COMMANDS

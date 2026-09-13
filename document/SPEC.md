@@ -48,11 +48,11 @@ Some files are both: prose a person reads, and input a command runs on. Put it i
 
 The field-by-field reference is [`MANIFEST.md`](MANIFEST.md). What the specification itself asks for:
 
-1. `[open-package] version` is there, and is a version this runner can speak for. **Required.** See section 4.
+1. `[open-package] version` is there, and is a version this runner supports. **Required.** See section 4.
 2. `[package] name` and `version` are there. **Required.** Neither is an identifier. A package is found by where it is, so `name` is just what the package calls itself, and it can read like a title.
 3. `manifest.toml` is committed with the package. **Required.** Without it the package arrives with no statement of what it is.
 4. A `[command]` body runs something. **Required.** A body that runs nothing exits 0, and the command reports success without having run.
-5. A `[command]` name is one the runner has not already spent, which means not a built-in and not a name beginning with `-`. **Expected.** `run <name>` still reaches it. You lose the short form, not the command.
+5. A `[command]` name is one the runner has not already taken, which means not a built-in and not a name beginning with `-`. **Expected.** `run <name>` still reaches it, and `run -- <name>` when the name begins with `-`, since after `run` a word shaped like an option is one until the terminator says otherwise. You lose the short form, not the command.
 6. Every value is written as the type `MANIFEST.md` gives it. **Required.** A runner refuses a value of another type rather than rendering it, so `version = 1` is not `"1"`.
 
 `requires` is not among them. Whether the executables it names are on this machine is a fact about the machine, so `check` only warns. Copying a package somewhere plainer does not make it malformed.
@@ -63,8 +63,8 @@ There is no field for what a command does, and none for the environment. The lis
 
 There is one compatibility axis, `[open-package] version`. There is no separate specification number.
 
-1. A package declares the open-package it is written for. **Required.** The value is the least version whose behaviour the package needs, not the version of the runner that happened to mint it. Otherwise a runner's own patch release turns into a compatibility event.
-2. A runner refuses to run anything for a package it cannot speak for. **Required.** It speaks for a package when the majors match and its own version is at least what the package asks for.
+1. A package declares the open-package it is written for. **Required.** The value is the least version whose behaviour the package needs, not the version of the runner that happened to write it. Otherwise a runner's own patch release turns into a compatibility event.
+2. A runner refuses to run anything for a package it does not support. **Required.** It supports a package when the majors match and its own version is at least what the package asks for.
 3. `[package] version` goes up when behaviour changes, and stays put for presentation-only edits. **Expected.** No runner can tell whether behaviour changed.
 
 A newer 1.x runner reads a package written for 1.0. A package asking for 1.4 is refused by a 1.2 runner. Across a major it is refused in both directions, since that is a different format. A runner that read a manifest as far as it happened to make sense would quietly do the wrong thing, so it runs nothing at all instead.
@@ -84,13 +84,13 @@ The runner answers these itself:
 | `spec` | no | Print the specification summary |
 | `new` | no | Create a package |
 
-`spec` and `new` answer without a package around them. That is why bootstrapping is one download. `help` is claimed too, by the argument parser.
+`spec` and `new` answer without a package around them. That is why bootstrapping is one download. `help` is taken too, by the argument parser.
 
 ### The package's own
 
 Any name not answered by the runner is looked up in `[command]` and run from the package root through `sh`. Its exit code is the runner's exit code.
 
-`run <name>` is the same call written the long way, and reaches every name including the ones the runner answers first. The short form is what anyone writes.
+`run <name>` is the same call written the long way, and reaches every name including the ones the runner answers first. A name beginning with `-` is written `run -- <name>`, since the words after `run` are read as options until the terminator. The short form is what anyone writes.
 
 A name means nothing beyond the line beside it. What a package calls its commands is up to the package.
 
@@ -125,7 +125,7 @@ Packages can nest, and the same rule covers it. `source/` may hold a whole packa
 
 ## 8. The runner
 
-Every package is read by the same program, and it lives on the machine. It reads the manifest, refuses what it cannot speak for, runs commands from the package root, and answers the built-ins. Nothing about any one package goes in, which is how one binary serves them all.
+Every package is read by the same program, and it lives on the machine. It reads the manifest, refuses what it does not support, runs commands from the package root, and answers the built-ins. Nothing about any one package goes in, which is how one binary serves them all.
 
 The reference runner is a macOS universal binary built from `source/open-package`. It is published as a release asset rather than committed, which is rule 7.4 applied to the runner itself.
 
