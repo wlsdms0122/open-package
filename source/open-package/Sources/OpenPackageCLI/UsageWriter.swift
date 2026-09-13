@@ -7,8 +7,8 @@
 
 import OpenPackage
 
-/// The screen someone sees who does not know what is inside a package. A runner standing
-/// on its own still answers with what it can do.
+/// The screen someone sees who does not know what is inside a package. A runner standing on
+/// its own still prints what it can do.
 struct UsageWriter {
     // MARK: - Property
     private let manifest: Manifest?
@@ -29,12 +29,14 @@ struct UsageWriter {
         guard let manifest else {
             return [
                 "open-package \(Environment.version)",
-                "No package here. 'open-package new <path>' starts one."
+                "No package here."
             ]
         }
 
+        // Spelled out. A bare version in brackets reads as a second version of the package
+        // rather than as the open-package it was written for.
         return [
-            "\(manifest.name) \(manifest.version)  (open-package \(manifest.requiredRunner))"
+            "\(manifest.name) \(manifest.version)  (written for open-package \(manifest.requiredRunner))"
         ] + (manifest.summary.isEmpty ? [] : [manifest.summary])
     }
 
@@ -45,15 +47,14 @@ struct UsageWriter {
             return ["", "COMMANDS", "    (none declared)"]
         }
 
-        // The listing is the one description of a command that cannot be wrong, because it is
-        // the command. That only holds while a name the short form misses says so, and says
-        // how it is reached instead.
+        // The row is the command line itself, so it cannot describe the command wrongly. A
+        // name the short form misses has to say so, and say how it is reached instead.
         return ["", "COMMANDS"] + manifest.commands.map { command in
-            guard CommandName(command.name).claim != nil else {
-                return row(command.name, command.text)
-            }
+            let name = CommandName(command.name)
 
-            return row(command.name, "\(command.text)  (run \(command.name))")
+            guard name.conflict != nil else { return row(command.name, command.text) }
+
+            return row(command.name, "\(command.text)  (\(name.invocation))")
         }
     }
 
@@ -61,8 +62,33 @@ struct UsageWriter {
         ["", "BUILT IN"] + BuiltinCommand.allCases.map { row($0.rawValue, $0.summary) }
     }
 
+    /// Where someone goes next, one runnable line each. Nothing else on the screen states
+    /// that a command in the list above is reached by putting `open-package` in front of it.
     private func footer() -> [String] {
-        ["", "Run 'open-package --help' for the runner, 'open-package spec' for the specification."]
+        // The JSON line is unconditional. A caller standing outside a package is asking a
+        // machine question too.
+        return [""] + (invocationHint() + [
+            "Use 'open-package --json' to read this as JSON.",
+            "Use 'open-package --help' for the runner's options.",
+            "Use 'open-package spec' for the specification."
+        ]).map { "  \($0)" }
+    }
+
+    /// Which way in to name, judged by the same predicate the rows above are marked with.
+    /// Judged any other way, this line can tell a package to type the one form the row right
+    /// above says will not reach it.
+    private func invocationHint() -> [String] {
+        guard let manifest else {
+            return ["Use 'open-package new <path>' to start a package."]
+        }
+        guard let first = manifest.commands.first else { return [] }
+
+        guard !manifest.commands.contains(where: { CommandName($0.name).isReachable }) else {
+            return ["Use 'open-package <command>' to run one of this package's commands."]
+        }
+
+        return ["Use 'open-package \(CommandName(first.name).invocation)' to run one of this "
+            + "package's commands."]
     }
 
     /// padding(toLength:) truncates as readily as it pads, so the width has to clear the

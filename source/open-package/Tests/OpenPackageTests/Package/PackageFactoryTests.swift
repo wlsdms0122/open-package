@@ -20,13 +20,13 @@ struct PackageFactoryTests {
     @Test("a created package holds the whole skeleton")
     func createsSkeleton() throws {
         // Given
-        let destination = workspace.path("minted")
+        let destination = workspace.path("created")
 
         // When
         let identifier = try PackageFactory().create(at: destination)
 
         // Then
-        #expect(identifier == "minted")
+        #expect(identifier == "created")
 
         for entry in [
             PackageLayout.manifest,
@@ -42,20 +42,20 @@ struct PackageFactoryTests {
     }
 
     @Test("the skeleton it writes is a package the inspector accepts")
-    func writesSoundPackage() throws {
+    func writesValidPackage() throws {
         // Given
-        let destination = workspace.path("minted")
+        let destination = workspace.path("created")
 
         // When
         try PackageFactory().create(at: destination)
 
         // Then
         let directory = PackageDirectory(root: destination)
-        let manifest = try directory.speakableManifest()
+        let manifest = try directory.manifest()
 
-        #expect(manifest.name == "minted")
+        #expect(manifest.name == "created")
         #expect(manifest.command(named: "verify") != nil)
-        #expect(PackageInspector(directory: directory, manifest: manifest).inspect().isSound)
+        #expect(PackageInspector(directory: directory, manifest: manifest).inspect().isValid)
     }
 
     @Test("an existing path is refused rather than written over")

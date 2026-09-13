@@ -12,7 +12,7 @@ public struct Diagnosis: Sendable {
     public private(set) var errors: [String] = []
     public private(set) var warnings: [String] = []
 
-    public var isSound: Bool { errors.isEmpty }
+    public var isValid: Bool { errors.isEmpty }
     public var isClean: Bool { errors.isEmpty && warnings.isEmpty }
 
     public var report: String {

@@ -7,22 +7,25 @@
 
 import OpenPackage
 
-/// A refusal from the library, with the way out that only this surface can name.
-///
-/// The library says what is wrong and stops there, because what to type next is written in
-/// words this command line chose. Another surface over the same library would answer to
-/// different ones, and none of them are the library's to know.
+/// A refusal from the library, with the way out that only this surface can name. The
+/// library says what is wrong and stops there, since what to type next is written in words
+/// this command line chose.
 struct Refusal: Error, CustomStringConvertible {
     // MARK: - Property
     private let error: Error
 
     var description: String {
-        guard let next else { return "\(error)" }
+        guard let next else { return cause }
 
-        return "\(error)\n\(next)"
+        return "\(cause)\n\(next)"
     }
 
-    private var next: String? {
+    /// What went wrong, which is the library's answer and the same for everyone asking.
+    var cause: String { "\(error)" }
+
+    /// What to type instead, in this surface's own words. Kept apart from the cause so a
+    /// caller matching on what went wrong does not break when the advice is reworded.
+    var next: String? {
         let runner = CLI.configuration.commandName ?? PackageLayout.manifest
 
         switch error {
@@ -30,7 +33,7 @@ struct Refusal: Error, CustomStringConvertible {
             return "Run '\(runner) \(BuiltinCommand.spec.rawValue)' to see what a package looks like, "
                 + "or '\(runner) \(BuiltinCommand.new.rawValue) <path>' to start one."
 
-        case RunnerError.unknownCommand:
+        case RunnerError.unknownCommand, CallError.unnamed:
             return "Run '\(runner)' for the list."
 
         default:
@@ -45,7 +48,7 @@ struct Refusal: Error, CustomStringConvertible {
 
     // MARK: - Public
     /// Runs the body and re-raises whatever it refuses with the way out attached.
-    static func attaching<Answer>(_ body: () throws -> Answer) throws -> Answer {
+    static func attaching<Value>(_ body: () throws -> Value) throws -> Value {
         do {
             return try body()
         } catch {

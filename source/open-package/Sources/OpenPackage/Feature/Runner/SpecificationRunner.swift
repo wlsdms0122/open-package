@@ -5,10 +5,8 @@
 //  Created by JSilver on 8/30/26.
 //
 
-/// Produces the specification summary.
-///
-/// It takes no package. Someone who does not know the specification asks first and may be
-/// standing anywhere, so this is the one thing the runner answers with nothing around it.
+/// Produces the specification summary. It takes no package, since someone who does not know
+/// the specification asks first and may be standing anywhere.
 public struct SpecificationRunner: Sendable {
     // MARK: - Property
     // MARK: - Initializer

@@ -35,15 +35,15 @@ struct SpecificationTests {
 
     @Test("neither the document nor the summary fixes a command name")
     func nothingFixesACommandName() throws {
-        // Given the format spends no word on a package's own command names. A table of
+        // Given the format says nothing about a package's own command names. A table of
         // meanings growing back into either text is the drift this catches: the runner
         // would go on ignoring it, and packages would be written to a rule nothing holds.
-        let claims = ["Fixed in meaning", "COMMANDS WITH A FIXED MEANING", "reserved"]
+        let fixings = ["Fixed in meaning", "COMMANDS WITH A FIXED MEANING", "reserved"]
 
         // When, Then
-        for claim in claims {
-            #expect(!(try document()).contains(claim))
-            #expect(!Specification.summary.contains(claim))
+        for fixing in fixings {
+            #expect(!(try document()).contains(fixing))
+            #expect(!Specification.summary.contains(fixing))
         }
     }
 
@@ -53,7 +53,7 @@ struct SpecificationTests {
         let sut = Specification.summary
 
         // Then the summary writes the built-ins as prose, because which words this surface
-        // spends is not the library's to know. This is what keeps the two from drifting.
+        // takes is not the library's to know. This is what keeps the two from drifting.
         for builtin in BuiltinCommand.allCases {
             #expect(sut.contains(builtin.rawValue))
             #expect(sut.contains(builtin.summary))
@@ -116,7 +116,7 @@ struct SpecificationTests {
 
     /// The names drawn in a layout tree: the lines under `<package>/` that sit one level in,
     /// read down to the first blank line or fence. A continuation line is indented past the
-    /// name column, which is what keeps it out.
+    /// name column, so it falls outside.
     private func entries(inTreeOf text: String) -> Set<String> {
         let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
 

@@ -7,9 +7,8 @@
 
 import Foundation
 
-/// The two streams a command line answers on. What belongs on which is not a detail: a
-/// caller that pipes this binary reads one of them and the person watching reads the
-/// other, so an answer printed to the wrong stream is an answer nobody asked for.
+/// The two streams a command line writes on. A caller that pipes this binary reads one and
+/// the person watching reads the other, so which one a line goes to decides who sees it.
 enum Output {
     static func write(_ text: String) {
         print(text)

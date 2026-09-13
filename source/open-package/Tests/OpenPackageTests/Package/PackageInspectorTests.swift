@@ -46,7 +46,7 @@ struct PackageInspectorTests {
         let diagnosis = try inspect(root)
 
         // Then
-        #expect(!diagnosis.isSound)
+        #expect(!diagnosis.isValid)
         #expect(diagnosis.errors.contains { $0.contains("name") })
         #expect(diagnosis.errors.contains { $0.contains("version") })
     }
@@ -61,7 +61,7 @@ struct PackageInspectorTests {
         let diagnosis = try inspect(root)
 
         // Then the layout is a convention, so a departure is reported without failing.
-        #expect(diagnosis.isSound)
+        #expect(diagnosis.isValid)
         #expect(diagnosis.warnings.contains { $0.contains(PackageLayout.readme) })
     }
 
@@ -77,7 +77,7 @@ struct PackageInspectorTests {
         let diagnosis = try inspect(root)
 
         // Then
-        #expect(diagnosis.isSound)
+        #expect(diagnosis.isValid)
         #expect(diagnosis.warnings.contains { $0.contains(PackageLayout.source) })
     }
 
@@ -93,7 +93,7 @@ struct PackageInspectorTests {
         let diagnosis = try inspect(root)
 
         // Then
-        #expect(diagnosis.isSound)
+        #expect(diagnosis.isValid)
         #expect(diagnosis.errors.isEmpty)
     }
 
@@ -117,7 +117,7 @@ struct PackageInspectorTests {
         let diagnosis = try inspect(root)
 
         // Then
-        #expect(diagnosis.isSound, "a package is not malformed because this machine is short a tool")
+        #expect(diagnosis.isValid, "a package is not malformed because this machine is short a tool")
         #expect(diagnosis.warnings.contains { $0.contains("no-such-executable-anywhere") })
     }
 
@@ -133,7 +133,7 @@ struct PackageInspectorTests {
         ))
 
         // When, Then a verify that does nothing must not be able to answer yes.
-        #expect(!(try inspect(root).isSound))
+        #expect(!(try inspect(root).isValid))
     }
 
     @Test("an entry outside the specification is a warning")
@@ -146,7 +146,7 @@ struct PackageInspectorTests {
         let diagnosis = try inspect(root)
 
         // Then
-        #expect(diagnosis.isSound)
+        #expect(diagnosis.isValid)
         #expect(diagnosis.warnings.contains { $0.contains("build.py") })
     }
 
@@ -172,7 +172,7 @@ struct PackageInspectorTests {
     }
 
     @Test(
-        "which names a package spends is not the specification's business",
+        "which names a package uses is not the specification's business",
         arguments: ["build = \"true\"", "check = \"echo mine\"", "help = \"echo mine\"", ""]
     )
     func staysSilentAboutCommandNames(commands: String) throws {
@@ -184,7 +184,7 @@ struct PackageInspectorTests {
         ))
 
         // When, Then a name means what the specification says and nothing this can see, and
-        // which words a runner has spent is that runner's fact, and CommandNameTests covers it.
+        // which words a runner has taken is that runner's fact, and CommandNameTests covers it.
         #expect(try inspect(root).isClean)
     }
 
@@ -193,6 +193,6 @@ struct PackageInspectorTests {
     private func inspect(_ root: URL) throws -> Diagnosis {
         let directory = PackageDirectory(root: root)
 
-        return PackageInspector(directory: directory, manifest: try directory.speakableManifest()).inspect()
+        return PackageInspector(directory: directory, manifest: try directory.manifest()).inspect()
     }
 }
