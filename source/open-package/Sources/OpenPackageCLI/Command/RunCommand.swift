@@ -15,9 +15,9 @@ import OpenPackage
 ///
 /// Without this, the short form's convenience would decide what a package may call things,
 /// and which words were lost would depend on which runner was holding the package. Here the
-/// manifest is read the same way by anything that can read it, and a claimed name costs the
-/// short form rather than the command.
-struct RunCommand: ParsableCommand {
+/// manifest is read the same way by anything that can read it, and a name the runner has
+/// taken costs the short form rather than the command.
+struct RunCommand: PassthroughCommand {
     // MARK: - Property
     static let configuration = CommandConfiguration(
         commandName: BuiltinCommand.run.rawValue,
@@ -27,10 +27,13 @@ struct RunCommand: ParsableCommand {
 
             Write the short form. This is for the few names the runner answers first, and for a script that would rather not know which those are.
 
+            A name beginning with - is written `run -- <name>`. The words after this one are read as options until the terminator, so without it the name is read as one of those.
+
             EXAMPLES
                 open-package run verify
                 open-package run build a.md -o b.html
                 open-package run check
+                open-package run -- -x
             """
     )
 
@@ -43,19 +46,15 @@ struct RunCommand: ParsableCommand {
     @Argument(parsing: .captureForPassthrough, help: "Arguments for that command.")
     private var arguments: [String] = []
 
+    /// Said here and used by the short form too, which is this command written shorter, so
+    /// it names neither spelling.
+    static let formatUnavailable = "the command's own output passes through, so the runner "
+        + "formats nothing here. Ask the command for JSON if it has any."
+
     // MARK: - Initializer
     init() { }
 
     // MARK: - Public
-    func run() throws {
-        let status = try Refusal.attaching {
-            try CommandRunner(origin: Runtime().origin).run(name, arguments: arguments)
-        }
-
-        guard status == 0 else {
-            throw ExitCode(status)
-        }
-    }
 
     // MARK: - Private
 }

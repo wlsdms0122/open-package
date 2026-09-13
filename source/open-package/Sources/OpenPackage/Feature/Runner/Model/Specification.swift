@@ -28,18 +28,18 @@ enum Specification {
         MANIFEST
             [open-package] version     The open-package this package is written for. The runner
                                        you invoke is the one that judges, and a runner that
-                                       cannot speak for it refuses to run anything
+                                       does not support it refuses to run anything
             [package]      name version description requires. Which package this is, is the
                            directory it is in, so the manifest does not name one
             [command]      <name> = "command to run from the package root"
 
-            Values are strings, integers, booleans and single-line arrays, and a value must be written as the type it is declared as. Arguments given after a command name are appended, unless the line contains $@, in which case it places them itself. That is what a pipeline or a sequence needs. A name the runner answers first (run, check, spec, new, help), or one starting with -, is not reached by the short form, and `run <name>` reaches it.
+            Values are strings, integers, booleans and single-line arrays, and a value must be written as the type it is declared as. Arguments given after a command name are appended, unless the line contains $@, in which case it places them itself. That is what a pipeline or a sequence needs. A name the runner answers first (run, check, spec, new, help), or one starting with -, is not reached by the short form. `run <name>` reaches it, and `run -- <name>` reaches one starting with -.
 
         PACKAGE COMMANDS
             No command name is fixed. What a package calls its commands is up to the package. Names like build, test and verify are what packages tend to reach for, not meanings the specification has settled. A command answers with its exit code rather than with prose for a person to judge. Write down what success looks like and a person has to read and rule on it every time.
 
         BUILT-IN COMMANDS
-            Answered by the runner itself, in any package. run and check are about a package, so they need one around them. spec and new answer anywhere, which is what makes bootstrapping a single download.
+            Answered by the runner itself, in any package. run and check are about a package, so they need one around them. spec and new answer anywhere, so bootstrapping is one download.
 
             run      Run one of the package's own commands by name
             check    Inspect the layout and the manifest

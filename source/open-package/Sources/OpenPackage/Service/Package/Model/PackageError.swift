@@ -8,8 +8,8 @@
 import Foundation
 
 /// Why a path is not a package, or not one that can be made. What the manifest inside it
-/// gets wrong is `ManifestError`, and what a runner refuses although the package is sound
-/// is `RunnerError`.
+/// gets wrong is `ManifestError`, and what a runner refuses although the package is valid is
+/// `RunnerError`.
 public enum PackageError: Error, CustomStringConvertible, Sendable {
     case packageNotFound
     case pathExists(URL)

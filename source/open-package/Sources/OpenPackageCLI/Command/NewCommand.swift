@@ -9,7 +9,7 @@ import ArgumentParser
 import Foundation
 import OpenPackage
 
-struct NewCommand: ParsableCommand {
+struct NewCommand: FormattedCommand {
     // MARK: - Property
     static let configuration = CommandConfiguration(
         commandName: BuiltinCommand.new.rawValue,
@@ -24,23 +24,29 @@ struct NewCommand: ParsableCommand {
             EXAMPLES
                 open-package new ../sample-package
                 open-package new /tmp/scratch-package
+                open-package new ../sample-package --json
             """
     )
 
     @Argument(help: "Where to create the package. Its last component becomes the package id.")
     var path: String
 
+    @OptionGroup
+    var format: OutputFormat
+
     // MARK: - Initializer
     // MARK: - Public
-    func run() throws {
+    func execute() throws -> CommandResult<CreationRecord> {
         let destination = Runtime().resolve(path)
+        let name = try CreationRunner().run(at: destination)
+        let record = CreationRecord(created: destination.path, name: name)
 
-        _ = try Refusal.attaching { try CreationRunner().run(at: destination) }
-
-        Output.write("created  \(destination.path)")
-        Output.write("")
-        Output.write("Next, fill in name and description in \(PackageLayout.manifest), then write a command that answers.")
-        Output.write("Do not describe what success looks like in prose; let the command answer with its exit code.")
+        return CommandResult(record) {
+            Output.write("created  \(destination.path)")
+            Output.write("")
+            Output.write("Next, fill in name and description in \(PackageLayout.manifest), then write a command that answers.")
+            Output.write("Do not describe what success looks like in prose; let the command answer with its exit code.")
+        }
     }
 
     // MARK: - Private

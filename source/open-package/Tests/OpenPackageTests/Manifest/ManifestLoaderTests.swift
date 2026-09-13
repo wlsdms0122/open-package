@@ -14,8 +14,8 @@ struct ManifestLoaderTests {
     // MARK: - Property
     // MARK: - Initializer
     // MARK: - Test
-    @Test("a runner speaks for the same major up to its own version, and for nothing else")
-    func speaksWithinItsOwnMajor() throws {
+    @Test("a runner supports the same major up to its own version, and nothing else")
+    func supportsWithinItsOwnMajor() throws {
         // Given the cases are written against the running binary's own version. Spelling the
         // numbers out would mean editing this suite on every release, which is an edit that
         // can silently agree with whatever the gate now does.
@@ -36,7 +36,7 @@ struct ManifestLoaderTests {
 
         // When, Then
         for (version, expected) in cases {
-            #expect(ManifestLoader.speaks(version) == expected, "\(version)")
+            #expect(ManifestLoader.supports(version) == expected, "\(version)")
         }
     }
 

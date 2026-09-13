@@ -20,33 +20,24 @@ public struct CommandRunner: Sendable {
     }
 
     // MARK: - Public
-    /// The exit status of the command. A name the manifest does not declare is refused
-    /// here, so that "there is no such command" is answered by the package rather than by
-    /// whichever surface happened to ask.
+    /// The exit status of the command. A name the manifest does not declare is refused here,
+    /// so "there is no such command" comes from the package rather than from whichever
+    /// surface asked.
     public func run(_ name: String, arguments: [String]) throws -> Int32 {
-        let directory = try PackageLocator(origin: origin).package()
-        let manifest = try directory.speakableManifest()
+        try resolve(name).run(arguments)
+    }
 
-        guard let command = manifest.command(named: name) else {
+    /// The command a name stands for, read once. A surface that has to know whether a call
+    /// reaches anything before it decides what else to print asks for this and then runs it.
+    public func resolve(_ name: String) throws -> ResolvedCommand {
+        let directory = try PackageLocator(origin: origin).package()
+
+        guard let line = try directory.manifest().command(named: name) else {
             throw RunnerError.unknownCommand(name)
         }
 
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/sh")
-        process.currentDirectoryURL = directory.root
-        process.arguments = ["-c", script(for: command), name] + arguments
-
-        try process.run()
-        process.waitUntilExit()
-
-        return process.terminationStatus
+        return ResolvedCommand(name: name, line: line, root: directory.root)
     }
 
     // MARK: - Private
-    /// Appending the arguments is only right for a command that is one invocation. Where a
-    /// line is a pipeline or a sequence, the tail is not where they belong, so a manifest
-    /// that writes `"$@"` itself decides, and keeps that decision visible in the listing.
-    private func script(for command: String) -> String {
-        command.contains("$@") ? command : "\(command) \"$@\""
-    }
 }

@@ -4,6 +4,8 @@ A package format that is neutral about language and consumer. This repository is
 
 A directory becomes an open-package by stating what it is in `manifest.toml`. It can hold shell scripts, a compiled tool, prose, or a whole Swift package. Run `open-package` inside it and it tells you what it can run, and the line each name runs.
 
+That listing takes `--json`, and so does `check`, which answers the same thing in one line for a program rather than for a person. The specification says a package does not ask who reads it, and this is the runner keeping that promise on its own surface.
+
 This directory is itself an open-package, and it passes its own `check`.
 
 The specification is [`document/SPEC.md`](document/SPEC.md), and the field-by-field reference is [`document/MANIFEST.md`](document/MANIFEST.md). `open-package spec` prints a summary of the first from inside any package, and `open-package --help` explains the runner.
@@ -77,20 +79,28 @@ Sources/OpenPackage/
     Manifest/           what a package declares, and loading it
   Module/
     TOML/               the subset a manifest is written in
-    Environment.swift   what this binary is, and what it can speak for
+    Environment.swift   what this binary is, and which packages it supports
   Core/
     Version.swift       the versions everything here is compared by
 
 Sources/OpenPackageCLI/
   CLI.swift             the entry point, the manual, and the one fork
-  Passthrough.swift     a word the package owns, run before the parser sees it
+  Passthrough.swift     a call to the package's own commands, run before the parser sees it
+  Call.swift            where the runner's words end and the command's begin
+  CallError.swift       what is wrong with a call, as this surface sees it
   Refusal.swift         a library error, with the way out only this surface can name
   UsageWriter.swift     the screen for someone who does not know what is inside
-  Command/              one file per built-in, and the names this surface has taken
-  Support/              where this process is, and the two streams it answers on
+  Output/               which of the two forms the output takes, the two streams it goes
+                        on, the envelope every JSON line carries, and one record per thing
+                        the runner prints
+  Command/              one file per built-in, what a built-in may be, and the names this
+                        surface has taken
+  Support/              where this process is
 ```
 
-The path tells you which layer a type belongs to. `Feature/` is the library's whole public face, one type per thing the runner does. The ones that act on an existing package find it themselves and refuse what this runner cannot speak for, so no entry point skips either step. `Service/` holds what the format is made of, and is almost entirely internal. `Module/` holds what the format is not about: a TOML reader owes nothing to open-package, and which binary is running is a fact about the process. `Core/` is what every layer compares itself against.
+A built-in is one of two things. It either states its result, in both forms at once, or it says why it has none because it passes the package's own output through instead. The names the runner has taken map to the commands that answer them in one switch, and each arm passes through the protocol for its kind, so a name with nothing behind it and a command that is neither kind are both compile errors.
+
+The path tells you which layer a type belongs to. `Feature/` is the library's whole public face, one type per thing the runner does. The ones that act on an existing package find it themselves and refuse what this runner does not support, so no entry point skips either step. `Service/` holds what the format is made of, and is almost entirely internal. `Module/` holds what the format is not about: a TOML reader owes nothing to open-package, and which binary is running is a fact about the process. `Core/` is what every layer compares itself against.
 
 Subjects sit side by side rather than nested. A manifest is not part of a package's layout, and TOML is not part of a manifest. A concept with its own vocabulary keeps it in its own `Model/`, behaviour sits at the top of its concept, and an error lives where it is raised. That last one is why the version gate and every way a manifest can fail to be read share a file.
 

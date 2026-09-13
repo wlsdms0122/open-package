@@ -9,7 +9,7 @@ import ArgumentParser
 import Foundation
 import OpenPackage
 
-struct CheckCommand: ParsableCommand {
+struct CheckCommand: FormattedCommand {
     // MARK: - Property
     static let configuration = CommandConfiguration(
         commandName: BuiltinCommand.check.rawValue,
@@ -30,25 +30,44 @@ struct CheckCommand: ParsableCommand {
 
             EXAMPLES
                 open-package check
+                open-package check --json
             """
     )
 
+    @OptionGroup
+    var format: OutputFormat
+
     // MARK: - Initializer
     // MARK: - Public
-    func run() throws {
-        var inspection = try Refusal.attaching { try InspectionRunner(origin: Runtime().origin).run() }
+    func execute() throws -> CommandResult<PackageRecord> {
+        var inspection = try InspectionRunner(origin: Runtime().origin).run()
 
         // The library judged the package against the specification; a name this runner has
-        // already spent is something only this side can see.
-        for warning in CommandName.claims(in: inspection.manifest) {
+        // already taken is something only this side can see.
+        for warning in CommandName.conflicts(in: inspection.manifest) {
             inspection.diagnosis.warn(warning)
         }
 
+        let record = PackageRecord(
+            manifest: inspection.manifest,
+            diagnosis: inspection.diagnosis
+        )
+
+        return CommandResult(record, status: inspection.diagnosis.isValid ? .success : .failure) {
+            write(inspection)
+        }
+    }
+
+    // MARK: - Private
+    /// A finding is a diagnostic, so it goes to the stream a person is watching. The JSON
+    /// side is the answer itself and goes to the one a caller reads, which is why the two
+    /// do not share this.
+    private func write(_ inspection: Inspection) {
         let manifest = inspection.manifest
         let diagnosis = inspection.diagnosis
 
         guard !diagnosis.isClean else {
-            Output.write("ok  \(manifest.name) \(manifest.version) is sound in layout and manifest")
+            Output.write("ok  \(manifest.name) \(manifest.version) has a valid layout and manifest")
 
             return
         }
@@ -58,11 +77,5 @@ struct CheckCommand: ParsableCommand {
         Output.writeError(
             "\(manifest.name): \(diagnosis.errors.count) error · \(diagnosis.warnings.count) warn"
         )
-
-        guard diagnosis.isSound else {
-            throw ExitCode.failure
-        }
     }
-
-    // MARK: - Private
 }

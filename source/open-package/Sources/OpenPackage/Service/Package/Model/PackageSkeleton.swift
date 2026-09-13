@@ -11,7 +11,7 @@ struct PackageSkeleton: Sendable {
     /// What a package written today actually needs: the first version of this major.
     ///
     /// A new package uses nothing that was added after the format opened, so declaring the
-    /// version that minted it would make a runner's own patch release a compatibility event:
+    /// version that created it would make a runner's own patch release a compatibility event:
     /// a 1.0.2 runner refusing what 1.0.3 wrote, over a bug fix neither package touched. The
     /// field means the least version whose behaviour is needed, and this is that.
     private static var requiredRunner: Version { Version(major: Environment.version.major) }
