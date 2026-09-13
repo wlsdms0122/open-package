@@ -1,6 +1,6 @@
 # The open-package specification
 
-**open-package 1.0.0.** This document is normative. The runner carries a summary of it and prints that with `open-package spec`. If the two disagree, this one is right.
+**open-package 1.1.0.** This document is normative. The runner carries a summary of it and prints that with `open-package spec`. If the two disagree, this one is right.
 
 Rules come at three strengths. **Required** means a directory that breaks it is not an open-package. **Expected** means there are real exceptions, and a person can look at one and decide to leave it alone. **Allowed** covers the rest. Anything this document does not mention is free.
 
