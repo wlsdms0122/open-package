@@ -9,7 +9,7 @@ import ArgumentParser
 import Foundation
 import OpenPackage
 
-struct SpecCommand: ParsableCommand {
+struct SpecCommand: FormattedCommand {
     // MARK: - Property
     static let configuration = CommandConfiguration(
         commandName: BuiltinCommand.spec.rawValue,
@@ -21,13 +21,21 @@ struct SpecCommand: ParsableCommand {
 
             EXAMPLES
                 open-package spec
+                open-package spec --json
             """
     )
 
+    @OptionGroup
+    var format: OutputFormat
+
     // MARK: - Initializer
     // MARK: - Public
-    func run() throws {
-        Output.write(SpecificationRunner().run())
+    func execute() throws -> CommandResult<SpecificationRecord> {
+        let specification = SpecificationRunner().run()
+
+        return CommandResult(SpecificationRecord(specification: specification)) {
+            Output.write(specification)
+        }
     }
 
     // MARK: - Private
