@@ -29,11 +29,11 @@ public enum ManifestError: Error, CustomStringConvertible, Sendable {
             return "cannot read \(url.path): \(reason)"
 
         case let .malformed(error):
-            return "\(PackageLayout.manifest) \(error.description)"
+            return "\(Manifest.fileName) \(error.description)"
 
         case .undeclaredRunnerVersion:
             return """
-                \(PackageLayout.manifest) has no [\(Manifest.declaration)] version. \
+                \(Manifest.fileName) has no [\(Manifest.declaration)] version. \
                 A package must state which open-package it is written for.
                 """
 

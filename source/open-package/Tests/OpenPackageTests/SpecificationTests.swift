@@ -84,7 +84,7 @@ struct SpecificationTests {
     func declarationIsTheSameEverywhere() throws {
         // Given the runner tells a package's manifest from any other manifest.toml by one
         // table, and nothing compiles the prose that tells a person which.
-        let declaration = "\(PackageLayout.manifest) that opens an [\(Manifest.declaration)] table"
+        let declaration = "\(Manifest.fileName) that opens an [\(Manifest.declaration)] table"
 
         // When, Then
         #expect(try document().replacingOccurrences(of: "`", with: "").contains(declaration))

@@ -26,7 +26,7 @@ struct Refusal: Error, CustomStringConvertible {
     /// What to type instead, in this surface's own words. Kept apart from the cause so a
     /// caller matching on what went wrong does not break when the advice is reworded.
     var next: String? {
-        let runner = CLI.configuration.commandName ?? PackageLayout.manifest
+        let runner = CLI.configuration.commandName ?? Manifest.fileName
 
         switch error {
         case PackageError.packageNotFound:

@@ -21,7 +21,7 @@ public enum PackageError: Error, CustomStringConvertible, Sendable {
         case .packageNotFound:
             return """
                 no open-package here. Looked in this directory and upward for a \
-                \(PackageLayout.manifest) with an [\(Manifest.declaration)] table
+                \(Manifest.fileName) with an [\(Manifest.declaration)] table
                 """
 
         case let .pathExists(url):

@@ -9,7 +9,9 @@
 /// it, are the receiving side's knowledge and deliberately absent.
 public struct Manifest: Sendable {
     // MARK: - Property
-    /// The table that makes a `manifest.toml` an open-package manifest.
+    /// The file a package holds its manifest in, and the table that makes that file an
+    /// open-package manifest. Together they are the whole of what makes a directory a package.
+    public static let fileName = "manifest.toml"
     static let declaration = "open-package"
 
     public let requiredRunner: Version

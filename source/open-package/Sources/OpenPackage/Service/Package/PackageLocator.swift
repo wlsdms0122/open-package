@@ -51,6 +51,6 @@ struct PackageLocator: Sendable {
 
     // MARK: - Private
     private func declaration(in directory: URL) -> ManifestDeclaration {
-        ManifestLoader(url: directory.appendingPathComponent(PackageLayout.manifest)).declaration()
+        ManifestLoader(url: directory.appendingPathComponent(Manifest.fileName)).declaration()
     }
 }

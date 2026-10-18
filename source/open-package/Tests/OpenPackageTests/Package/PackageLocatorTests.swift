@@ -40,7 +40,7 @@ struct PackageLocatorTests {
         let foreign = package.appendingPathComponent("vendor/tool")
         try FileManager.default.createDirectory(at: foreign, withIntermediateDirectories: true)
         try "[package]\nname = \"tool\"\n".write(
-            to: foreign.appendingPathComponent(PackageLayout.manifest),
+            to: foreign.appendingPathComponent(Manifest.fileName),
             atomically: true,
             encoding: .utf8
         )
@@ -79,7 +79,7 @@ struct PackageLocatorTests {
         let package = try workspace.package("outer", manifest: .manifest(named: "outer"))
         let inner = package.appendingPathComponent("inner")
         try FileManager.default.createDirectory(at: inner, withIntermediateDirectories: true)
-        try Data([0xFF, 0xFE, 0x00]).write(to: inner.appendingPathComponent(PackageLayout.manifest))
+        try Data([0xFF, 0xFE, 0x00]).write(to: inner.appendingPathComponent(Manifest.fileName))
 
         let sut = PackageLocator(origin: inner)
 

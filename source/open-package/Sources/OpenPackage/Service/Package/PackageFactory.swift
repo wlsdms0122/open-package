@@ -16,7 +16,7 @@ struct PackageFactory: Sendable {
     @discardableResult
     func create(at destination: URL) throws -> String {
         let files = FileManager.default
-        let manifest = destination.appendingPathComponent(PackageLayout.manifest)
+        let manifest = destination.appendingPathComponent(Manifest.fileName)
 
         let identifier = destination.lastPathComponent
         guard !identifier.isEmpty, identifier != ".", identifier != ".." else {

@@ -39,7 +39,7 @@ final class Workspace {
 
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         try manifest.write(
-            to: root.appendingPathComponent(PackageLayout.manifest),
+            to: root.appendingPathComponent(Manifest.fileName),
             atomically: true,
             encoding: .utf8
         )

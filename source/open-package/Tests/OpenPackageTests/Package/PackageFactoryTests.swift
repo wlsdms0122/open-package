@@ -28,7 +28,7 @@ struct PackageFactoryTests {
         // Then
         #expect(identifier == "created")
 
-        #expect(try FileManager.default.contentsOfDirectory(atPath: destination.path) == [PackageLayout.manifest])
+        #expect(try FileManager.default.contentsOfDirectory(atPath: destination.path) == [Manifest.fileName])
     }
 
     @Test("the skeleton it writes is a package the inspector accepts")
@@ -61,7 +61,7 @@ struct PackageFactoryTests {
         // Then
         let entries = try FileManager.default.contentsOfDirectory(atPath: destination.path).sorted()
 
-        #expect(entries == [PackageLayout.manifest, "tool.py"])
+        #expect(entries == [Manifest.fileName, "tool.py"])
     }
 
     @Test("a manifest already there is refused rather than written over")
@@ -70,7 +70,7 @@ struct PackageFactoryTests {
         let destination = workspace.path("taken")
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
         try "kept".write(
-            to: destination.appendingPathComponent(PackageLayout.manifest),
+            to: destination.appendingPathComponent(Manifest.fileName),
             atomically: true,
             encoding: .utf8
         )
@@ -80,7 +80,7 @@ struct PackageFactoryTests {
             try PackageFactory().create(at: destination)
         }
         #expect(
-            try String(contentsOf: destination.appendingPathComponent(PackageLayout.manifest), encoding: .utf8)
+            try String(contentsOf: destination.appendingPathComponent(Manifest.fileName), encoding: .utf8)
                 == "kept"
         )
     }

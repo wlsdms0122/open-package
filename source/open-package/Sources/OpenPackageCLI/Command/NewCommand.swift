@@ -44,7 +44,7 @@ struct NewCommand: FormattedCommand {
         return CommandResult(record) {
             Output.write("created  \(destination.path)")
             Output.write("")
-            Output.write("Next, fill in name and description in \(PackageLayout.manifest), then write a command that answers.")
+            Output.write("Next, fill in name and description in \(Manifest.fileName), then write a command that answers.")
             Output.write("Do not describe what success looks like in prose; let the command answer with its exit code.")
         }
     }
