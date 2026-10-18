@@ -22,17 +22,17 @@ public struct ResolvedCommand: Sendable {
     }
 
     // MARK: - Public
-    /// Runs from the package root and returns the exit status.
-    public func run(_ arguments: [String]) throws -> Int32 {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/sh")
-        process.currentDirectoryURL = root
-        process.arguments = ["-c", script, name] + arguments
+    /// Replaces the runner with the command, run from the package root. The command is then
+    /// the process its caller started, so its terminal, its signals and its exit are its own.
+    public func run(_ arguments: [String]) throws -> Never {
+        guard FileManager.default.changeCurrentDirectoryPath(root.path) else {
+            throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .ENOENT)
+        }
 
-        try process.run()
-        process.waitUntilExit()
+        let argv = (["/bin/sh", "-c", script, name] + arguments).map { strdup($0) } + [nil]
+        execv("/bin/sh", argv)
 
-        return process.terminationStatus
+        throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .ENOEXEC)
     }
 
     // MARK: - Private

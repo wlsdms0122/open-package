@@ -1,6 +1,6 @@
 # The open-package specification
 
-**open-package 1.2.0.** This document is normative. The runner carries a summary of it and prints that with `open-package spec`. If the two disagree, this one is right.
+**open-package 1.2.1.** This document is normative. The runner carries a summary of it and prints that with `open-package spec`. If the two disagree, this one is right.
 
 Rules come at three strengths. **Required** means a directory that breaks it is not an open-package. **Expected** means there are real exceptions, and a person can look at one and decide to leave it alone. **Allowed** covers the rest. Anything this document does not mention is free.
 
@@ -71,7 +71,7 @@ The runner answers these itself:
 
 ### The package's own
 
-Any name not answered by the runner is looked up in `[command]` and run from the package root through `sh`. Its exit code is the runner's exit code.
+Any name not answered by the runner is looked up in `[command]` and run from the package root through `sh`. The runner hands its process over to that `sh`, so the command is the process its caller started: it has the caller's terminal and signals, and it ends the runner the way it ends, by its exit code or by its signal.
 
 `run <name>` is the same call written the long way, and reaches every name including the ones the runner answers first. A name beginning with `-` is written `run -- <name>`, since the words after `run` are read as options until the terminator. The short form is what anyone writes.
 
