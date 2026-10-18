@@ -18,7 +18,8 @@ let package = Package(
         .target(name: "OpenPackageCore"),
         .target(
             name: "OpenPackage",
-            dependencies: ["OpenPackageCore"]
+            dependencies: ["OpenPackageCore"],
+            plugins: ["PackageVersion"]
         ),
         .executableTarget(
             name: "OpenPackageCLI",
@@ -26,6 +27,15 @@ let package = Package(
                 "OpenPackage",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ]
+        ),
+        .executableTarget(
+            name: "PackageVersionTool",
+            dependencies: ["OpenPackageCore"]
+        ),
+        .plugin(
+            name: "PackageVersion",
+            capability: .buildTool(),
+            dependencies: ["PackageVersionTool"]
         ),
         .testTarget(
             name: "OpenPackageCoreTests",

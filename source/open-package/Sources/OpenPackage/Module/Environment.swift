@@ -8,5 +8,5 @@
 import OpenPackageCore
 
 public enum Environment {
-    public static let version = Version(major: 1, minor: 2, patch: 1)
+    public static let version = packageVersion
 }
