@@ -51,7 +51,7 @@ struct Passthrough {
                 throw ExitCode.validationFailure
             }
 
-            return try format.refusing { try command.run(call.arguments) }
+            try format.refusing { try command.run(call.arguments) }
         } catch let code as ExitCode {
             // Already answered.
             return code.rawValue

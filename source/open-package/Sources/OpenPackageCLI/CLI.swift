@@ -19,7 +19,7 @@ struct CLI: FormattedCommand {
             This is the manual for the runner. What an open-package is, and what a manifest may say, is `open-package spec`.
 
             PACKAGE COMMANDS
-                Any name that is not built in is looked up in [command] and run from the package root through sh, with the arguments that follow it appended unless the line places $@ itself. The command's exit code is the runner's.
+                Any name that is not built in is looked up in [command] and run from the package root through sh, with the arguments that follow it appended unless the line places $@ itself. The runner becomes the command, so its terminal, signals and exit are the command's.
 
                     open-package build a.md -o b.html
 

@@ -15,6 +15,8 @@ struct CLIRunner {
     struct Result {
         // MARK: - Property
         let status: Int32
+        var signaled = false
+        var processIdentifier: Int32 = 0
         let standardOutput: String
         let standardError: String
 
@@ -88,6 +90,8 @@ struct CLIRunner {
 
         return Result(
             status: process.terminationStatus,
+            signaled: process.terminationReason == .uncaughtSignal,
+            processIdentifier: process.processIdentifier,
             standardOutput: capture.read(capture.outputURL),
             standardError: capture.read(capture.errorURL)
         )
