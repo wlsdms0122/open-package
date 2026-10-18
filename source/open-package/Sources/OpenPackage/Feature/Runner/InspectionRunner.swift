@@ -26,7 +26,7 @@ public struct InspectionRunner: Sendable {
 
         return Inspection(
             manifest: manifest,
-            diagnosis: PackageInspector(directory: directory, manifest: manifest).inspect()
+            diagnosis: PackageInspector(manifest: manifest).inspect()
         )
     }
 

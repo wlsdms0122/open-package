@@ -11,12 +11,10 @@ import Foundation
 /// what its own commands answer, and this deliberately does not ask it.
 struct PackageInspector: Sendable {
     // MARK: - Property
-    private let directory: PackageDirectory
     private let manifest: Manifest
 
     // MARK: - Initializer
-    init(directory: PackageDirectory, manifest: Manifest) {
-        self.directory = directory
+    init(manifest: Manifest) {
         self.manifest = manifest
     }
 
@@ -25,7 +23,6 @@ struct PackageInspector: Sendable {
         var diagnosis = Diagnosis()
 
         inspectIdentity(&diagnosis)
-        inspectLayout(&diagnosis)
         inspectRequirements(&diagnosis)
         inspectCommands(&diagnosis)
 
@@ -39,29 +36,6 @@ struct PackageInspector: Sendable {
     private func inspectIdentity(_ diagnosis: inout Diagnosis) {
         if manifest.name.isEmpty { diagnosis.fail("[package] name is missing") }
         if manifest.version.isEmpty { diagnosis.fail("[package] version is missing") }
-    }
-
-    /// Warnings throughout, because `manifest.toml` is the whole of what a package must have.
-    /// The rest of the layout is the shape a package usually takes, and reporting a departure
-    /// as malformed would make a convention into a requirement by way of the exit code.
-    private func inspectLayout(_ diagnosis: inout Diagnosis) {
-        if !exists(PackageLayout.readme) {
-            diagnosis.warn("no \(PackageLayout.readme) here, so the package does not describe itself")
-        }
-
-        if !isDirectory(PackageLayout.source), !isDirectory(PackageLayout.document) {
-            diagnosis.warn(
-                "neither \(PackageLayout.source)/ nor \(PackageLayout.document)/ exists, "
-                    + "so the package carries nothing"
-            )
-        }
-
-        for entry in contents() where !PackageLayout.allows(entry) {
-            diagnosis.warn(
-                "entry outside the specification: \(entry) "
-                    + "(move it into \(PackageLayout.source)/ or \(PackageLayout.document)/)"
-            )
-        }
     }
 
     private func inspectRequirements(_ diagnosis: inout Diagnosis) {
@@ -86,24 +60,6 @@ struct PackageInspector: Sendable {
         where command.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             diagnosis.fail("[command] \(command.name) is empty")
         }
-    }
-
-    private func contents() -> [String] {
-        let entries = try? FileManager.default.contentsOfDirectory(atPath: directory.root.path)
-
-        return (entries ?? []).sorted()
-    }
-
-    private func exists(_ name: String) -> Bool {
-        FileManager.default.fileExists(atPath: directory.root.appendingPathComponent(name).path)
-    }
-
-    private func isDirectory(_ name: String) -> Bool {
-        var directoryFlag: ObjCBool = false
-        let path = directory.root.appendingPathComponent(name).path
-        let found = FileManager.default.fileExists(atPath: path, isDirectory: &directoryFlag)
-
-        return found && directoryFlag.boolValue
     }
 
     private func isExecutableOnPath(_ name: String) -> Bool {

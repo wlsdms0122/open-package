@@ -42,30 +42,6 @@ struct PackageSkeleton: Sendable {
         """
     }
 
-    var readme: String {
-        """
-        # \(identifier)
-
-        <What this package is, and what it is good for.>
-
-        This directory is an **open-package**. See `open-package spec`.
-
-        ## Usage
-
-        ```
-        open-package verify
-        ```
-
-        ## What is inside
-
-        | Path | Role |
-        |---|---|
-        | `source/` | |
-        | `document/` | |
-
-        """
-    }
-
     // MARK: - Initializer
     init(identifier: String) {
         self.identifier = identifier

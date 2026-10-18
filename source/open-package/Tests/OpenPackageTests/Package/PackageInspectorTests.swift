@@ -51,50 +51,18 @@ struct PackageInspectorTests {
         #expect(diagnosis.errors.contains { $0.contains("version") })
     }
 
-    @Test("a package that does not describe itself is said so, and is still a package")
-    func warnsAboutMissingReadme() throws {
-        // Given
+    @Test("how the rest of the directory is arranged is not the specification's business")
+    func staysSilentAboutTheLayout() throws {
+        // Given a manifest beside entries of any name, and no README.
         let root = try workspace.package("fixture", manifest: .manifest(named: "fixture"))
-        try FileManager.default.removeItem(at: root.appendingPathComponent(PackageLayout.readme))
+        try FileManager.default.createDirectory(
+            at: root.appendingPathComponent("engine"),
+            withIntermediateDirectories: true
+        )
+        try "".write(to: root.appendingPathComponent("build.py"), atomically: true, encoding: .utf8)
 
-        // When
-        let diagnosis = try inspect(root)
-
-        // Then the layout is a convention, so a departure is reported without failing.
-        #expect(diagnosis.isValid)
-        #expect(diagnosis.warnings.contains { $0.contains(PackageLayout.readme) })
-    }
-
-    @Test("a package carrying neither source nor document is said so, and is still a package")
-    func warnsAboutEmptyPackage() throws {
-        // Given
-        let root = try workspace.package("fixture", manifest: .manifest(named: "fixture"))
-        for branch in [PackageLayout.source, PackageLayout.document] {
-            try FileManager.default.removeItem(at: root.appendingPathComponent(branch))
-        }
-
-        // When
-        let diagnosis = try inspect(root)
-
-        // Then
-        #expect(diagnosis.isValid)
-        #expect(diagnosis.warnings.contains { $0.contains(PackageLayout.source) })
-    }
-
-    @Test("a manifest is the whole of what a package must have")
-    func acceptsAPackageThatIsOnlyAManifest() throws {
-        // Given a directory holding nothing but the one required file.
-        let root = try workspace.package("fixture", manifest: .manifest(named: "fixture"))
-        for entry in [PackageLayout.readme, PackageLayout.source, PackageLayout.document] {
-            try FileManager.default.removeItem(at: root.appendingPathComponent(entry))
-        }
-
-        // When
-        let diagnosis = try inspect(root)
-
-        // Then
-        #expect(diagnosis.isValid)
-        #expect(diagnosis.errors.isEmpty)
+        // When, Then
+        #expect(try inspect(root).isClean)
     }
 
     @Test("a required executable this machine lacks is a warning, not a malformed package")
@@ -136,32 +104,6 @@ struct PackageInspectorTests {
         #expect(!(try inspect(root).isValid))
     }
 
-    @Test("an entry outside the specification is a warning")
-    func warnsAboutStrayEntry() throws {
-        // Given
-        let root = try workspace.package("fixture", manifest: .manifest(named: "fixture"))
-        try "".write(to: root.appendingPathComponent("build.py"), atomically: true, encoding: .utf8)
-
-        // When
-        let diagnosis = try inspect(root)
-
-        // Then
-        #expect(diagnosis.isValid)
-        #expect(diagnosis.warnings.contains { $0.contains("build.py") })
-    }
-
-    @Test("dotfiles and licences are allowed at the top level")
-    func allowsDotfilesAndLicence() throws {
-        // Given
-        let root = try workspace.package("fixture", manifest: .manifest(named: "fixture"))
-        for entry in [".gitignore", "LICENSE.md"] {
-            try "".write(to: root.appendingPathComponent(entry), atomically: true, encoding: .utf8)
-        }
-
-        // When, Then
-        #expect(try inspect(root).isClean)
-    }
-
     @Test("what a package calls itself is not checked against the directory it is in")
     func staysSilentAboutTheDirectoryName() throws {
         // Given a name that reads like a title rather than like a path.
@@ -191,8 +133,6 @@ struct PackageInspectorTests {
 
     // MARK: - Private
     private func inspect(_ root: URL) throws -> Diagnosis {
-        let directory = PackageDirectory(root: root)
-
-        return PackageInspector(directory: directory, manifest: try directory.manifest()).inspect()
+        PackageInspector(manifest: try PackageDirectory(root: root).manifest()).inspect()
     }
 }

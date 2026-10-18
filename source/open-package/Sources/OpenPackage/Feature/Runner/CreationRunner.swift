@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Creates a package: the manifest, the README and the two branches.
+/// Creates a package: a directory holding its manifest.
 public struct CreationRunner: Sendable {
     // MARK: - Property
     // MARK: - Initializer
