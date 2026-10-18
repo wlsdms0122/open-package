@@ -7,9 +7,7 @@
 
 import Foundation
 
-/// A command the manifest was found to declare, and the place it runs from. Read once and
-/// carried, so a surface can ask whether a call reaches anything and then run that same
-/// result. Looked up twice, the second reading could find a manifest the first did not.
+/// Resolved once and then run, so the manifest is not read twice.
 public struct ResolvedCommand: Sendable {
     // MARK: - Property
     let name: String
@@ -24,8 +22,7 @@ public struct ResolvedCommand: Sendable {
     }
 
     // MARK: - Public
-    /// The exit status of the command. The working directory is the package root, so a
-    /// manifest writes its paths relative to the package and to nothing else.
+    /// Runs from the package root and returns the exit status.
     public func run(_ arguments: [String]) throws -> Int32 {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/sh")
@@ -39,9 +36,8 @@ public struct ResolvedCommand: Sendable {
     }
 
     // MARK: - Private
-    /// Appending is only right for a command that is one invocation. Where a line is a
-    /// pipeline or a sequence the tail is not where the arguments belong, so a manifest that
-    /// writes `"$@"` places them itself.
+    /// Arguments are appended unless the line places `"$@"` itself, since the tail of a
+    /// pipeline or sequence is not where they belong.
     private var script: String {
         line.contains("$@") ? line : "\(line) \"$@\""
     }

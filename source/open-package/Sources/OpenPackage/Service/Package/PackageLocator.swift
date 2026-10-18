@@ -7,10 +7,8 @@
 
 import Foundation
 
-/// Finds the package a command is about by walking up from where it was called, the way a
-/// package manager does. A package is found by where it is, not by what it is called and
-/// not by an environment variable. A `manifest.toml` that does not declare an open-package
-/// belongs to something else, and the walk goes on past it.
+/// Walks up from `origin` to the nearest `manifest.toml` that declares an open-package;
+/// other `manifest.toml` files are skipped.
 struct PackageLocator: Sendable {
     // MARK: - Property
     private let origin: URL
@@ -21,8 +19,7 @@ struct PackageLocator: Sendable {
     }
 
     // MARK: - Public
-    /// The package here, or nothing. Standing outside one is an ordinary answer, which the
-    /// listing screen is written for, so it is not raised as an error.
+    /// `nil` outside a package, which is not an error.
     func locate() -> PackageDirectory? {
         var directory = origin.resolvingSymlinksInPath()
 
@@ -42,7 +39,6 @@ struct PackageLocator: Sendable {
         }
     }
 
-    /// The package here, where there being none is the caller's problem.
     func package() throws -> PackageDirectory {
         guard let directory = locate() else { throw PackageError.packageNotFound }
 

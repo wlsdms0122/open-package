@@ -45,8 +45,7 @@ struct CLI: FormattedCommand {
 
     // MARK: - Initializer
     // MARK: - Public
-    /// The one fork in this binary: a word the package owns is run before the parser is
-    /// given a chance at it, and everything else is the parser's.
+    /// Package-command calls are dispatched before the parser; everything else is the parser's.
     static func main() {
         let arguments = Array(CommandLine.arguments.dropFirst())
 
@@ -63,7 +62,6 @@ struct CLI: FormattedCommand {
         }
     }
 
-    /// No arguments: what this package offers, or that there is no package here.
     func execute() throws -> CommandResult<PackageRecord> {
         let manifest = try ManifestRunner(origin: Runtime().origin).run()
 
@@ -73,14 +71,11 @@ struct CLI: FormattedCommand {
     }
 
     // MARK: - Private
-    /// What to leave with, once whatever the parser refused has been written in the form the
-    /// words asked for. The parser words its own prose and leaves, so a caller that asked for
-    /// JSON would read that prose off the screen instead.
+    /// Writes a parser refusal as JSON when asked, since the parser itself prints prose.
     private static func answered(_ error: Error, asked arguments: [String]) -> Error {
         let status = exitCode(for: error)
 
-        // A built-in writes its own refusal and reaches here as a status, and help and the
-        // version leave with nothing refused at all.
+        // Built-ins already wrote their refusal, and help and version are not refusals.
         guard !(error is ExitCode), status != .success else { return error }
 
         let format = OutputFormat(words: arguments)

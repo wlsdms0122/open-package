@@ -7,9 +7,7 @@
 
 import OpenPackage
 
-/// A refusal from the library, with the way out that only this surface can name. The
-/// library says what is wrong and stops there, since what to type next is written in words
-/// this command line chose.
+/// A library error with this CLI's advice on what to type next.
 struct Refusal: Error, CustomStringConvertible {
     // MARK: - Property
     private let error: Error
@@ -20,11 +18,8 @@ struct Refusal: Error, CustomStringConvertible {
         return "\(cause)\n\(next)"
     }
 
-    /// What went wrong, which is the library's answer and the same for everyone asking.
     var cause: String { "\(error)" }
 
-    /// What to type instead, in this surface's own words. Kept apart from the cause so a
-    /// caller matching on what went wrong does not break when the advice is reworded.
     var next: String? {
         let runner = CLI.configuration.commandName ?? Manifest.fileName
 
@@ -47,7 +42,6 @@ struct Refusal: Error, CustomStringConvertible {
     }
 
     // MARK: - Public
-    /// Runs the body and re-raises whatever it refuses with the way out attached.
     static func attaching<Value>(_ body: () throws -> Value) throws -> Value {
         do {
             return try body()

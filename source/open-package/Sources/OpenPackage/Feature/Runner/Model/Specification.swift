@@ -5,8 +5,7 @@
 //  Created by JSilver on 8/30/26.
 //
 
-/// The summary every runner carries. `document/SPEC.md` is the normative text, and wins
-/// where the two disagree.
+/// A summary; `document/SPEC.md` is normative and wins where they disagree.
 public enum Specification {
     public static var summary: String {
         """

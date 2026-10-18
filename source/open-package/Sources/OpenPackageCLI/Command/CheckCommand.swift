@@ -39,8 +39,7 @@ struct CheckCommand: FormattedCommand {
     func execute() throws -> CommandResult<PackageRecord> {
         var inspection = try InspectionRunner(origin: Runtime().origin).run()
 
-        // The library judged the package against the specification; a name this runner has
-        // already taken is something only this side can see.
+        // Name conflicts depend on this runner, so the library cannot report them.
         for warning in CommandName.conflicts(in: inspection.manifest) {
             inspection.diagnosis.warn(warning)
         }
@@ -56,9 +55,7 @@ struct CheckCommand: FormattedCommand {
     }
 
     // MARK: - Private
-    /// A finding is a diagnostic, so it goes to the stream a person is watching. The JSON
-    /// side is the answer itself and goes to the one a caller reads, which is why the two
-    /// do not share this.
+    /// Findings go to stderr; JSON output goes to stdout.
     private func write(_ inspection: Inspection) {
         let manifest = inspection.manifest
         let diagnosis = inspection.diagnosis

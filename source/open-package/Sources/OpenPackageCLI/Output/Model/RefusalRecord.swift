@@ -5,9 +5,7 @@
 //  Created by JSilver on 9/11/26.
 //
 
-/// Why the runner printed nothing else. The cause and the way out are two keys rather than
-/// one paragraph, so a caller matching on what went wrong does not break when the advice
-/// beside it is reworded.
+/// Separate keys, so a caller matching on `reason` does not break when `next` is reworded.
 struct RefusalRecord: Encodable {
     // MARK: - Property
     let reason: String

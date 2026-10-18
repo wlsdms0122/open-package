@@ -7,12 +7,6 @@
 
 import Foundation
 
-/// Why the file that should say what this package is cannot be taken as it stands, ordered
-/// by how far reading got: no file, no text, no TOML, no stated open-package, and one this
-/// runner does not support. Each sends the reader somewhere else to fix it.
-///
-/// The last one is this binary being the wrong one to read the manifest rather than the
-/// manifest being wrong. It sits here because the gate is passed on the way to a manifest.
 public enum ManifestError: Error, CustomStringConvertible, Sendable {
     case unreadable(URL, reason: String)
     case malformed(TOMLError)
@@ -23,8 +17,6 @@ public enum ManifestError: Error, CustomStringConvertible, Sendable {
     // MARK: - Property
     public var description: String {
         switch self {
-        // Missing, unreadable and not-UTF-8 are three different things to go and fix, and the
-        // TOML error beside this one keeps its cause down to the line. Carry it.
         case let .unreadable(url, reason):
             return "cannot read \(url.path): \(reason)"
 

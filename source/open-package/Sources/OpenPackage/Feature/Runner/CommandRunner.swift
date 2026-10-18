@@ -7,7 +7,6 @@
 
 import Foundation
 
-/// Looks a name up in the manifest of the package around a place.
 public struct CommandRunner: Sendable {
     // MARK: - Property
     private let origin: URL

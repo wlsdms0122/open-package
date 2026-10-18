@@ -7,8 +7,7 @@
 
 import ArgumentParser
 
-/// What one built-in produced, stated once in both forms. They are stated together rather
-/// than chosen between, so a built-in cannot fill one in and leave the other empty.
+/// Both forms are required together, so a built-in cannot fill in only one.
 struct CommandResult<Record: Encodable> {
     // MARK: - Property
     let record: Record

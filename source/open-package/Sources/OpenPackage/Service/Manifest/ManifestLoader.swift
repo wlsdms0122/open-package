@@ -7,9 +7,6 @@
 
 import Foundation
 
-/// Turns a file into a `Manifest`, and keeps the three ways that can fail apart. Not being
-/// there, not being readable text, and not being written the way a manifest is written are
-/// separate things to go and fix.
 struct ManifestLoader: Sendable {
     // MARK: - Property
     private let url: URL
@@ -20,8 +17,7 @@ struct ManifestLoader: Sendable {
     }
 
     // MARK: - Public
-    /// Whether the file is an open-package manifest at all. One that declares the table is,
-    /// however wrong the rest of it is, so the answer reads the headers and nothing else.
+    /// Reads headers only, so a file that declares the table counts however broken the rest is.
     func declaration() -> ManifestDeclaration {
         guard FileManager.default.fileExists(atPath: url.path) else { return .absent }
         guard let source = try? String(contentsOf: url, encoding: .utf8) else { return .unreadable }
@@ -29,8 +25,6 @@ struct ManifestLoader: Sendable {
         return TOMLParser().tableNames(in: source).contains(Manifest.declaration) ? .declared : .foreign
     }
 
-    /// The manifest, refused unless this runner supports the version it asks for. A manifest
-    /// written for a version this binary does not have would be read as something else.
     func load() throws -> Manifest {
         let source: String
         do {
@@ -53,12 +47,6 @@ struct ManifestLoader: Sendable {
         return manifest
     }
 
-    /// Whether the running binary supports a package asking for `required`.
-    ///
-    /// A newer runner reads a package written for an older one of the same major. A package
-    /// asking for something this binary does not have yet is refused rather than read as far
-    /// as it happens to make sense. A major apart is a different format, so the answer is no
-    /// in both directions.
     static func supports(_ required: Version) -> Bool {
         required.major == Environment.version.major && required <= Environment.version
     }

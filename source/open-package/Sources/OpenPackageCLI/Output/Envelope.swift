@@ -7,9 +7,8 @@
 
 import OpenPackage
 
-/// A JSON line: the record's keys, and beside them `runner`, the binary that wrote it. The
-/// record must encode as an object, since `JSONEncoder` traps on a keyed container opened
-/// over an array or a single value.
+/// Adds `runner` beside the record's keys. The record must encode as an object, or
+/// `JSONEncoder` traps.
 struct Envelope<Record: Encodable>: Encodable {
     // MARK: - Property
     private let record: Record

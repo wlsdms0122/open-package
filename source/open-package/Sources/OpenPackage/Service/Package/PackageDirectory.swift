@@ -7,7 +7,6 @@
 
 import Foundation
 
-/// A package on disk, and the manifest it declares.
 struct PackageDirectory: Sendable {
     // MARK: - Property
     let root: URL

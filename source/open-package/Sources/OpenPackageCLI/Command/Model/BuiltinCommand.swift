@@ -7,9 +7,6 @@
 
 import ArgumentParser
 
-/// The names this runner answers itself, and what each of them reaches for. It is about the
-/// command line rather than the format: the library offers what can be done to a package,
-/// and naming those doings is the surface's own business.
 enum BuiltinCommand: String, CaseIterable, Sendable {
     case run
     case check
@@ -33,7 +30,6 @@ enum BuiltinCommand: String, CaseIterable, Sendable {
         }
     }
 
-    /// The built-in that answers this name.
     var command: ParsableCommand.Type {
         switch self {
         case .run:
@@ -51,10 +47,7 @@ enum BuiltinCommand: String, CaseIterable, Sendable {
     }
 
     // MARK: - Public
-    /// Whether this runner answers the name itself, which is the same question as whether a
-    /// manifest command by that name is reachable by the short form. `help` is not a case
-    /// here, since the parser owns it, but it is taken just as firmly, so the answer lives
-    /// in one place.
+    /// `help` is reserved too, though the parser owns it.
     static func reserves(_ name: String) -> Bool {
         name == "help" || BuiltinCommand(rawValue: name) != nil
     }

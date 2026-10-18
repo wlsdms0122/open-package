@@ -7,15 +7,14 @@
 
 import Foundation
 
-/// Creates a package by writing its manifest. A missing directory is made, and an existing
-/// one becomes a package as it stands.
+/// A missing directory is made; an existing one becomes a package as it stands.
 public struct CreationRunner: Sendable {
     // MARK: - Property
     // MARK: - Initializer
     public init() { }
 
     // MARK: - Public
-    /// The name the package was given, which is the last component of its path.
+    /// Returns the package name, which is the last path component.
     @discardableResult
     public func run(at destination: URL) throws -> String {
         let files = FileManager.default
@@ -39,8 +38,8 @@ public struct CreationRunner: Sendable {
     }
 
     // MARK: - Private
-    /// The declared version is the first of this major, the least a new package needs. The
-    /// running version would make a runner's patch release refuse what the previous one wrote.
+    /// Declares the major's floor, not the running version, so older runners of the same
+    /// major still accept the package.
     private func template(named name: String) -> String {
         """
         # The specification is `open-package spec`
