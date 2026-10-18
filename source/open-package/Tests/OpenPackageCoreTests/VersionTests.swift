@@ -1,13 +1,13 @@
 //
 //  VersionTests.swift
-//  OpenPackageTests
+//  OpenPackageCoreTests
 //
 //  Created by JSilver on 8/30/26.
 //
 
 import Testing
 
-@testable import OpenPackage
+@testable import OpenPackageCore
 
 @Suite("Version Tests")
 struct VersionTests {

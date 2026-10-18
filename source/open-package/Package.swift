@@ -15,7 +15,11 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
     ],
     targets: [
-        .target(name: "OpenPackage"),
+        .target(name: "OpenPackageCore"),
+        .target(
+            name: "OpenPackage",
+            dependencies: ["OpenPackageCore"]
+        ),
         .executableTarget(
             name: "OpenPackageCLI",
             dependencies: [
@@ -24,9 +28,14 @@ let package = Package(
             ]
         ),
         .testTarget(
+            name: "OpenPackageCoreTests",
+            dependencies: ["OpenPackageCore"]
+        ),
+        .testTarget(
             name: "OpenPackageTests",
             dependencies: [
                 "OpenPackage",
+                "OpenPackageCore",
                 // Force the executable to build before tests run so the CLI suite can invoke the real binary end-to-end.
                 "OpenPackageCLI"
             ]

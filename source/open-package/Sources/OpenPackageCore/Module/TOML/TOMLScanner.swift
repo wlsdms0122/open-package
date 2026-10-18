@@ -1,6 +1,6 @@
 //
 //  TOMLScanner.swift
-//  OpenPackage
+//  OpenPackageCore
 //
 //  Created by JSilver on 8/30/26.
 //

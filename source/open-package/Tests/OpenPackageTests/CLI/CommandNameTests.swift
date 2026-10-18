@@ -8,6 +8,7 @@
 import Testing
 
 @testable import OpenPackage
+@testable import OpenPackageCore
 @testable import OpenPackageCLI
 
 /// Which names are already reserved is the command line's knowledge, not the format's, so it
