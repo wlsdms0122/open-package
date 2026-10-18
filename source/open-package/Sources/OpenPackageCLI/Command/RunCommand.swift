@@ -9,15 +9,7 @@ import ArgumentParser
 import Foundation
 import OpenPackage
 
-/// The long way to one of the package's own commands. `open-package <name>` is the short way
-/// and is what anyone writes; it arrives everywhere except at a name this runner answers
-/// first.
-///
-/// Without this, the short form's convenience would decide what a package may call things,
-/// and which words were lost would depend on which runner was holding the package. Here the
-/// manifest is read the same way by anything that can read it, and a name the runner has
-/// taken costs the short form rather than the command.
-struct RunCommand: PassthroughCommand {
+struct RunCommand: ParsableCommand {
     // MARK: - Property
     static let configuration = CommandConfiguration(
         commandName: BuiltinCommand.run.rawValue,
@@ -40,14 +32,10 @@ struct RunCommand: PassthroughCommand {
     @Argument(help: "The name as [command] states it.")
     private var name: String
 
-    // `captureForPassthrough` rather than `unconditionalRemaining`, so that `run build --help`
-    // is the package's business. Anything else would let the runner answer a question that was
-    // addressed past it.
+    // `captureForPassthrough`, so `run build --help` reaches the command, not the runner.
     @Argument(parsing: .captureForPassthrough, help: "Arguments for that command.")
     private var arguments: [String] = []
 
-    /// Said here and used by the short form too, which is this command written shorter, so
-    /// it names neither spelling.
     static let formatUnavailable = "the command's own output passes through, so the runner "
         + "formats nothing here. Ask the command for JSON if it has any."
 
@@ -55,6 +43,10 @@ struct RunCommand: PassthroughCommand {
     init() { }
 
     // MARK: - Public
+    /// Unreachable: `Passthrough` dispatches every `run` call before the parser.
+    func run() throws {
+        throw CallError.undispatched(BuiltinCommand.run.rawValue)
+    }
 
     // MARK: - Private
 }

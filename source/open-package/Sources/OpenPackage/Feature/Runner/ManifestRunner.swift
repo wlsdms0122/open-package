@@ -7,9 +7,7 @@
 
 import Foundation
 
-/// What the package around a place declares, without judging any of it. Nothing found is
-/// `nil`, while something found and unreadable is raised. Folded together, a manifest with a
-/// typo would be reported as standing in the wrong directory.
+/// `nil` when no package is found; a found but broken manifest throws.
 public struct ManifestRunner: Sendable {
     // MARK: - Property
     private let origin: URL

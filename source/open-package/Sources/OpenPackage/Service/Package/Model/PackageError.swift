@@ -7,9 +7,6 @@
 
 import Foundation
 
-/// Why a path is not a package, or not one that can be made. What the manifest inside it
-/// gets wrong is `ManifestError`, and what a runner refuses although the package is valid is
-/// `RunnerError`.
 public enum PackageError: Error, CustomStringConvertible, Sendable {
     case packageNotFound
     case pathExists(URL)
@@ -19,7 +16,10 @@ public enum PackageError: Error, CustomStringConvertible, Sendable {
     public var description: String {
         switch self {
         case .packageNotFound:
-            return "no open-package here. Looked for \(PackageLayout.manifest) in this directory and upward"
+            return """
+                no open-package here. Looked in this directory and upward for a \
+                \(Manifest.fileName) with an [\(Manifest.declaration)] table
+                """
 
         case let .pathExists(url):
             return "already exists: \(url.path)"

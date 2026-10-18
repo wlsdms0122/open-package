@@ -1,6 +1,6 @@
 # The open-package specification
 
-**open-package 1.1.0.** This document is normative. The runner carries a summary of it and prints that with `open-package spec`. If the two disagree, this one is right.
+**open-package 1.2.0.** This document is normative. The runner carries a summary of it and prints that with `open-package spec`. If the two disagree, this one is right.
 
 Rules come at three strengths. **Required** means a directory that breaks it is not an open-package. **Expected** means there are real exceptions, and a person can look at one and decide to leave it alone. **Allowed** covers the rest. Anything this document does not mention is free.
 
@@ -8,41 +8,24 @@ Rules come at three strengths. **Required** means a directory that breaks it is 
 
 ## 1. Scope
 
-An open-package is a directory that states what it is, carries its own material, and says what it can run. That statement is written the same way whatever is inside, so you can ask a package what it offers instead of opening it up.
+An open-package is a directory that states what it is and says what it can run. That statement is one file, written the same way whatever is inside, so you can ask a package what it offers instead of opening it up.
 
-The package's material, its documents and its composition all travel inside it.
+Whatever the package carries travels inside it.
 
 The specification is neutral about two things.
 
 - Language. A manifest never says what a package is written in. It says what has to be on the machine (`requires`) and what can be run (`[command]`).
-- Consumer. The specification does not ask who reads a package. `README.md` and `document/` are prose for people, and the same prose read by an agent is a procedure.
+- Consumer. The specification does not ask who reads a package. What a package writes for people, an agent reads as a procedure.
 
-## 2. Layout
+## 2. What a package is
 
-```
-<package>/
-  manifest.toml   composition
-  README.md       what this package is and what it is good for
-  source/         the material of what the package does
-  document/       what the package says
-```
+A directory is an open-package when it holds a `manifest.toml` that opens an `[open-package]` table. The manifest is the whole specification of a package. It says the directory is one, and it says everything a receiving side needs to use it: which open-package reads it, what it is, what the machine needs, and what it can run.
 
-1. A package has `manifest.toml`. **Required.** It is the whole of what makes a directory a package.
-2. A package has `README.md`. **Expected.** Without it the package does not describe itself.
-3. A package puts its material in `source/` and what it says in `document/`, and keeps the top level to those four, `LICENSE*`, and entries beginning with a dot. **Expected.**
+1. A package has `manifest.toml`, and the file opens an `[open-package]` table. **Required.** The table is what makes the file a package's manifest. A `manifest.toml` without it belongs to some other format, and the directory holding it is not a package.
+
+Everything else in the directory is the package's own. The specification names no other file and no directory, so a README, a source tree or a folder of documents is arranged however the package likes, and `check` does not read it.
 
 The directory name can be anything. A package is identified by where it sits (section 6), so the manifest does not repeat it.
-
-Two branches. A file goes in `source/` if it is material the package works with, and in `document/` if it is something the package says. What decides it is the file's role. The format does not matter, and neither does who reads it.
-
-| File | Branch and why |
-|---|---|
-| JavaScript served to a browser | `source/`. A command bundles it into the output |
-| A syntax reference for the package's input format | `document/`. It says what the package accepts |
-| A procedure someone or something follows by hand | `document/`. The package is speaking, not working |
-| A template a command fills in | `source/`. The output is made of it |
-
-Some files are both: prose a person reads, and input a command runs on. Put it in `document/` if the package would still say it with no command reading it. Otherwise it exists to be consumed, and it belongs in `source/`.
 
 ## 3. manifest.toml
 
@@ -80,7 +63,7 @@ The runner answers these itself:
 | Name | Needs a package? | Meaning |
 |---|---|---|
 | `run` | yes | Run one of the package's own commands by name |
-| `check` | yes | Inspect the layout and the manifest |
+| `check` | yes | Inspect the manifest |
 | `spec` | no | Print the specification summary |
 | `new` | no | Create a package |
 
@@ -105,9 +88,11 @@ Appending works for a single invocation. It breaks a pipeline, where the end of 
 
 ## 6. Which package a command is about
 
-The one the caller is standing in. The search walks up from the working directory until it finds a `manifest.toml`, the way a package manager does. Nothing else is consulted: no environment variable, no registry, no configuration file.
+The one the caller is standing in. The search walks up from the working directory until it finds a `manifest.toml` that opens an `[open-package]` table, the way a package manager does. A `manifest.toml` without the table belongs to something else, and the search walks past it. Nothing else is consulted: no environment variable, no registry, no configuration file.
 
-Packages can nest, and the same rule covers it. `source/` may hold a whole package of another kind, and standing inside that one addresses it, since its `manifest.toml` is the nearest. The outer package reaches the inner one by relative path from the outer root. Each is judged on its own `[open-package] version`.
+The table is read from the file's headers alone, so a manifest that declares a package is the package however wrong the rest of it is, and `check` can say what is wrong.
+
+Packages can nest, and the same rule covers it. A package may hold another open-package, and standing inside that one addresses it, since its manifest is the nearest. The outer package reaches the inner one by relative path from the outer root. Each is judged on its own `[open-package] version`.
 
 ## 7. Rules
 
@@ -133,7 +118,7 @@ A package runs where its runner runs. The reference runner is a native binary, s
 
 ## 9. Changing the specification
 
-Adding something is a minor bump. Packages that want it declare the version that has it, and older packages keep working. Changing or removing something is a major bump, and majors do not read each other. Otherwise fallbacks for the old shape pile up until there are two specifications.
+Adding something is a minor bump. Packages that want it declare the version that has it, and older packages keep working. Loosening a rule is a minor bump too, since every package that was valid stays valid. Changing or removing something a package relies on is a major bump, and majors do not read each other. Otherwise fallbacks for the old shape pile up until there are two specifications.
 
 The move is:
 

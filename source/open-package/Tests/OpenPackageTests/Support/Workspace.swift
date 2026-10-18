@@ -37,20 +37,9 @@ final class Workspace {
     func package(_ name: String, manifest: String) throws -> URL {
         let root = path(name)
 
-        for branch in [PackageLayout.source, PackageLayout.document] {
-            try FileManager.default.createDirectory(
-                at: root.appendingPathComponent(branch),
-                withIntermediateDirectories: true
-            )
-        }
-
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         try manifest.write(
-            to: root.appendingPathComponent(PackageLayout.manifest),
-            atomically: true,
-            encoding: .utf8
-        )
-        try "# \(name)\n".write(
-            to: root.appendingPathComponent(PackageLayout.readme),
+            to: root.appendingPathComponent(Manifest.fileName),
             atomically: true,
             encoding: .utf8
         )

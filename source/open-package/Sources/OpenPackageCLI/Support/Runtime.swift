@@ -7,8 +7,6 @@
 
 import Foundation
 
-/// Where this process is: the directory it was called from. Which package that stands for
-/// is the library's question, and this hands it the place to start.
 struct Runtime {
     // MARK: - Property
     let origin: URL

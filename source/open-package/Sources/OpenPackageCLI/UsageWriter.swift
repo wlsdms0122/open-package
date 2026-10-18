@@ -7,8 +7,6 @@
 
 import OpenPackage
 
-/// The screen someone sees who does not know what is inside a package. A runner standing on
-/// its own still prints what it can do.
 struct UsageWriter {
     // MARK: - Property
     private let manifest: Manifest?
@@ -33,8 +31,7 @@ struct UsageWriter {
             ]
         }
 
-        // Spelled out. A bare version in brackets reads as a second version of the package
-        // rather than as the open-package it was written for.
+        // Spelled out, since a bare bracketed version reads as the package's own.
         return [
             "\(manifest.name) \(manifest.version)  (written for open-package \(manifest.requiredRunner))"
         ] + (manifest.summary.isEmpty ? [] : [manifest.summary])
@@ -47,8 +44,7 @@ struct UsageWriter {
             return ["", "COMMANDS", "    (none declared)"]
         }
 
-        // The row is the command line itself, so it cannot describe the command wrongly. A
-        // name the short form misses has to say so, and say how it is reached instead.
+        // A name the short form misses shows how to reach it.
         return ["", "COMMANDS"] + manifest.commands.map { command in
             let name = CommandName(command.name)
 
@@ -62,11 +58,7 @@ struct UsageWriter {
         ["", "BUILT IN"] + BuiltinCommand.allCases.map { row($0.rawValue, $0.summary) }
     }
 
-    /// Where someone goes next, one runnable line each. Nothing else on the screen states
-    /// that a command in the list above is reached by putting `open-package` in front of it.
     private func footer() -> [String] {
-        // The JSON line is unconditional. A caller standing outside a package is asking a
-        // machine question too.
         return [""] + (invocationHint() + [
             "Use 'open-package --json' to read this as JSON.",
             "Use 'open-package --help' for the runner's options.",
@@ -74,9 +66,7 @@ struct UsageWriter {
         ]).map { "  \($0)" }
     }
 
-    /// Which way in to name, judged by the same predicate the rows above are marked with.
-    /// Judged any other way, this line can tell a package to type the one form the row right
-    /// above says will not reach it.
+    /// Uses the rows' predicate, so it never suggests a form a row says is unreachable.
     private func invocationHint() -> [String] {
         guard let manifest else {
             return ["Use 'open-package new <path>' to start a package."]
@@ -91,8 +81,7 @@ struct UsageWriter {
             + "package's commands."]
     }
 
-    /// padding(toLength:) truncates as readily as it pads, so the width has to clear the
-    /// longest name rather than assume one.
+    /// `padding(toLength:)` also truncates, so the width must fit the longest name.
     private func row(_ name: String, _ summary: String) -> String {
         guard !summary.isEmpty else { return "    \(name)" }
 

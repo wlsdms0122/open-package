@@ -5,30 +5,22 @@
 //  Created by JSilver on 8/30/26.
 //
 
-/// The summary that travels inside every package. `document/SPEC.md` in the open-package
-/// repository is the normative text; where the two disagree, that document wins.
-enum Specification {
-    static var summary: String {
+/// A summary; `document/SPEC.md` is normative and wins where they disagree.
+public enum Specification {
+    public static var summary: String {
         """
         open-package \(Environment.version), a package specification that is neutral about language and consumer
 
-          <package>/
-            manifest.toml   composition. Which open-package, what it is, what it can run.
-                            The one thing a package must have
-            README.md       what this package is and what it is good for
-            source/         the material of what the package does: scripts, binaries,
-                            resources. A whole package of another kind may live in here
-            document/       what the package says, about itself and about its subject
-
-          Only manifest.toml is required. The rest is the shape a package usually takes, and a package can take another.
+          A directory is an open-package when it holds a manifest.toml that opens an [open-package] table. That file is the whole specification of a package: it says the directory is one, and it says everything needed to use it. How the rest of the directory is arranged is up to the package.
 
         WHAT IT IS FOR
-            Like npm, gem or crate: whatever is inside, the surface seen from outside is the same. Run `open-package` inside one and it lists what the package can run, and the line each name runs. A receiving side learns what a package offers without opening it. The specification does not ask whether the consumer is a person or a machine. README.md and document/ are prose for people, and the same prose read by an agent is a procedure.
+            Like npm, gem or crate: whatever is inside, the surface seen from outside is the same. Run `open-package` inside one and it lists what the package can run, and the line each name runs. A receiving side learns what a package offers without opening it. The specification does not ask whether the consumer is a person or a machine. A package's prose is for people, and the same prose read by an agent is a procedure.
 
         MANIFEST
-            [open-package] version     The open-package this package is written for. The runner
-                                       you invoke is the one that judges, and a runner that
-                                       does not support it refuses to run anything
+            [open-package] version     The open-package this package is written for. The table is
+                                       what makes the file a package's manifest. The runner you
+                                       invoke is the one that judges, and a runner that does not
+                                       support the version refuses to run anything
             [package]      name version description requires. Which package this is, is the
                            directory it is in, so the manifest does not name one
             [command]      <name> = "command to run from the package root"
@@ -42,7 +34,7 @@ enum Specification {
             Answered by the runner itself, in any package. run and check are about a package, so they need one around them. spec and new answer anywhere, so bootstrapping is one download.
 
             run      Run one of the package's own commands by name
-            check    Inspect the layout and the manifest
+            check    Inspect the manifest
             spec     Print the specification
             new      Create a package
 
@@ -53,6 +45,4 @@ enum Specification {
             4. What the package offers is already runnable. The receiving side is never asked to build it, so a compiled language ships its build product
         """
     }
-
-    // MARK: - Private
 }

@@ -102,9 +102,19 @@ struct CommandLineTests {
 
     @Test("check --json carries the findings, and the exit code still decides")
     func answersCheckAsJSON() throws {
-        // Given a package whose layout departs from the shape, so there is something to report.
-        let package = try bundled("sparse", manifest: .manifest(named: "sparse"))
-        try FileManager.default.removeItem(at: package.appendingPathComponent("README.md"))
+        // Given a package this machine is short a tool for, so there is something to report.
+        let package = try bundled("sparse", manifest: """
+            [open-package]
+            version = "\(Environment.version)"
+
+            [package]
+            name = "sparse"
+            version = "0.1.0"
+            requires = ["no-such-executable-anywhere"]
+
+            [command]
+            verify = "true"
+            """)
 
         // When
         let result = run(package, "check", "--json")
@@ -838,10 +848,32 @@ struct CommandLineTests {
         #expect(result.status == 0, "\(result.output)")
     }
 
-    @Test("a manifest that states no open-package version is refused")
+    @Test("a manifest.toml without an [open-package] table is not a package")
+    func passesByAForeignManifest() throws {
+        // Given
+        let package = try bundled("foreign", manifest: """
+            [package]
+            name = "foreign"
+            version = "0.1.0"
+
+            [command]
+            verify = "true"
+            """)
+
+        // When
+        let result = run(package, "verify")
+
+        // Then
+        #expect(result.status != 0, "\(result.output)")
+        #expect(result.output.contains("no open-package here"), "\(result.output)")
+    }
+
+    @Test("a manifest that declares an open-package but states no version is refused")
     func refusesUndeclaredRequirement() throws {
         // Given
         let package = try bundled("silent", manifest: """
+            [open-package]
+
             [package]
             name = "silent"
             version = "0.1.0"
@@ -855,6 +887,7 @@ struct CommandLineTests {
 
         // Then
         #expect(result.status != 0, "\(result.output)")
+        #expect(result.output.contains("has no [open-package] version"), "\(result.output)")
     }
 
     @Test("a malformed manifest is refused with the line that caused it")
@@ -911,7 +944,7 @@ struct CommandLineTests {
         #expect(created.status == 0, "\(created.output)")
         #expect(check.status == 0, "\(check.output)")
         #expect(verify.status != 0, "an unwritten verify must not pass")
-        #expect(again.status != 0, "an existing path must be refused")
+        #expect(again.status != 0, "an existing manifest must be refused")
 
     }
 
