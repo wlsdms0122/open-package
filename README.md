@@ -66,7 +66,7 @@ The Swift package is a library and a command line over it:
 ```
 Sources/OpenPackage/
   Feature/
-    Runner/             one runner per thing the library does, and what each answers with
+    Runner/             what the library does, one type each, and what each answers with
   Service/              the subjects the specification defines
     Package/            finding the package around a place
     Manifest/           what a package declares, and loading it
@@ -86,7 +86,7 @@ Sources/OpenPackageCLI/
   Output/               which of the two forms the output takes, the two streams it goes
                         on, the envelope every JSON line carries, and one record per thing
                         the runner prints
-  Command/              one file per built-in, and the names this surface has taken
+  Command/              the names this surface has taken, one file per built-in
   Support/              where this process is
 ```
 
