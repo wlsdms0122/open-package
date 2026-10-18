@@ -20,6 +20,15 @@ struct ManifestLoader: Sendable {
     }
 
     // MARK: - Public
+    /// Whether the file is an open-package manifest at all. One that declares the table is,
+    /// however wrong the rest of it is, so the answer reads the headers and nothing else.
+    func declaration() -> ManifestDeclaration {
+        guard FileManager.default.fileExists(atPath: url.path) else { return .absent }
+        guard let source = try? String(contentsOf: url, encoding: .utf8) else { return .unreadable }
+
+        return TOMLParser().tableNames(in: source).contains(Manifest.declaration) ? .declared : .foreign
+    }
+
     func load() throws -> Manifest {
         let source: String
         do {

@@ -9,6 +9,9 @@
 /// it, are the receiving side's knowledge and deliberately absent.
 public struct Manifest: Sendable {
     // MARK: - Property
+    /// The table that makes a `manifest.toml` an open-package manifest.
+    static let declaration = "open-package"
+
     public let requiredRunner: Version
     /// What the package calls itself. Not an identifier: which package this is, is the
     /// directory it is in, and a second copy of that in the manifest would be a fact that
@@ -28,7 +31,7 @@ public struct Manifest: Sendable {
     /// whether the rest may be read at all, so a manifest that cannot say which open-package
     /// it is written for is not one yet.
     init(document: TOMLDocument) throws {
-        guard let declared = try document.string("open-package.version") else {
+        guard let declared = try document.string("\(Self.declaration).version") else {
             throw ManifestError.undeclaredRunnerVersion
         }
         guard let required = Version(declared) else {

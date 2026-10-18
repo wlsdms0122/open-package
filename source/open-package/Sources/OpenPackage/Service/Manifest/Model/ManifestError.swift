@@ -33,12 +33,12 @@ public enum ManifestError: Error, CustomStringConvertible, Sendable {
 
         case .undeclaredRunnerVersion:
             return """
-                \(PackageLayout.manifest) has no [open-package] version. \
+                \(PackageLayout.manifest) has no [\(Manifest.declaration)] version. \
                 A package must state which open-package it is written for.
                 """
 
         case let .unreadableRunnerVersion(text):
-            return "[open-package] version is not a version: \(text)"
+            return "[\(Manifest.declaration)] version is not a version: \(text)"
 
         case let .unsupportedRunnerVersion(required):
             return """

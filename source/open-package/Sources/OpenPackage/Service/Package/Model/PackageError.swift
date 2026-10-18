@@ -19,7 +19,10 @@ public enum PackageError: Error, CustomStringConvertible, Sendable {
     public var description: String {
         switch self {
         case .packageNotFound:
-            return "no open-package here. Looked for \(PackageLayout.manifest) in this directory and upward"
+            return """
+                no open-package here. Looked in this directory and upward for a \
+                \(PackageLayout.manifest) with an [\(Manifest.declaration)] table
+                """
 
         case let .pathExists(url):
             return "already exists: \(url.path)"

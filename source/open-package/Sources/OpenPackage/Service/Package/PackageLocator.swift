@@ -9,7 +9,8 @@ import Foundation
 
 /// Finds the package a command is about by walking up from where it was called, the way a
 /// package manager does. A package is found by where it is, not by what it is called and
-/// not by an environment variable.
+/// not by an environment variable. A `manifest.toml` that does not declare an open-package
+/// belongs to something else, and the walk goes on past it.
 struct PackageLocator: Sendable {
     // MARK: - Property
     private let origin: URL
@@ -26,8 +27,12 @@ struct PackageLocator: Sendable {
         var directory = origin.resolvingSymlinksInPath()
 
         while true {
-            if holdsManifest(directory) {
+            switch declaration(in: directory) {
+            case .declared, .unreadable:
                 return PackageDirectory(root: directory)
+
+            case .absent, .foreign:
+                break
             }
 
             let parent = directory.deletingLastPathComponent()
@@ -45,9 +50,7 @@ struct PackageLocator: Sendable {
     }
 
     // MARK: - Private
-    private func holdsManifest(_ directory: URL) -> Bool {
-        FileManager.default.fileExists(
-            atPath: directory.appendingPathComponent(PackageLayout.manifest).path
-        )
+    private func declaration(in directory: URL) -> ManifestDeclaration {
+        ManifestLoader(url: directory.appendingPathComponent(PackageLayout.manifest)).declaration()
     }
 }

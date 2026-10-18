@@ -25,15 +25,8 @@ struct TOMLParser: Sendable {
         // nothing looks up would let a line of a manifest do nothing without saying so.
         var table: String?
 
-        // Split on newline characters, not on `CharacterSet.newlines`: that set sees CR and
-        // LF as two separators, so a CRLF file gains an empty line between every real one
-        // and every reported number drifts further from the file a person is looking at.
-        // A Character is the right unit here, since Swift already reads "\r\n" as one.
-        let lines = source.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
-
-        for (offset, rawLine) in lines.enumerated() {
+        for (offset, line) in lines(of: source).enumerated() {
             let number = offset + 1
-            let line = rawLine.trimmingCharacters(in: .whitespaces)
 
             if line.isEmpty || line.hasPrefix("#") { continue }
 
@@ -53,7 +46,37 @@ struct TOMLParser: Sendable {
         return TOMLDocument(entries: entries)
     }
 
+    /// The tables a source opens, read from its header lines alone and as TOML writes them,
+    /// with a trailing comment or a quoted name. Whether a header is one this subset accepts
+    /// is `parse`'s question, so a source it refuses still names the tables it has.
+    func tableNames(in source: String) -> [String] {
+        lines(of: source).compactMap { line in
+            guard line.hasPrefix("["), !line.hasPrefix("[["),
+                let close = line.firstIndex(of: "]")
+            else { return nil }
+
+            let name = line[line.index(after: line.startIndex)..<close].trimmingCharacters(in: .whitespaces)
+            let quotes: Set<Character> = ["\"", "'"]
+            guard name.count >= 2, let first = name.first, first == name.last, quotes.contains(first) else {
+                return name
+            }
+
+            return String(name.dropFirst().dropLast())
+        }
+    }
+
     // MARK: - Private
+    /// Each line trimmed, numbered from the first by position. Split on newline characters,
+    /// not on `CharacterSet.newlines`: that set sees CR and LF as two separators, so a CRLF
+    /// file gains an empty line between every real one and every reported number drifts
+    /// further from the file a person is looking at. A Character is the right unit here,
+    /// since Swift already reads "\r\n" as one.
+    private func lines(of source: String) -> [String] {
+        source
+            .split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+    }
+
     private func header(_ line: String, at number: Int) throws -> String {
         // Caught before the brackets come off, because `[[command]]` loses one pair to the
         // same dropFirst/dropLast a plain header uses and would arrive below as a table
