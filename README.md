@@ -66,9 +66,9 @@ The Swift package is a library and a command line over it:
 ```
 Sources/OpenPackage/
   Feature/
-    Runner/             everything the runner can do, and what it answers with
+    Runner/             one runner per thing the library does, and what each answers with
   Service/              the subjects the specification defines
-    Package/            finding, inspecting and creating one
+    Package/            finding the package around a place
     Manifest/           what a package declares, and loading it
   Module/
     TOML/               the subset a manifest is written in
@@ -86,20 +86,17 @@ Sources/OpenPackageCLI/
   Output/               which of the two forms the output takes, the two streams it goes
                         on, the envelope every JSON line carries, and one record per thing
                         the runner prints
-  Command/              one file per built-in, what a built-in may be, and the names this
-                        surface has taken
+  Command/              one file per built-in, and the names this surface has taken
   Support/              where this process is
 ```
 
-A built-in is one of two things. It either states its result, in both forms at once, or it says why it has none because it passes the package's own output through instead. The names the runner has taken map to the commands that answer them in one switch, and each arm passes through the protocol for its kind, so a name with nothing behind it and a command that is neither kind are both compile errors.
+A built-in either states its result in both forms at once, or, like `run`, passes the package's own output through. `BuiltinCommand` maps each name the runner has taken to the command that answers it in one switch.
 
-The path tells you which layer a type belongs to. `Feature/` is the library's whole public face, one type per thing the runner does. The ones that act on an existing package find it themselves and refuse what this runner does not support, so no entry point skips either step. `Service/` holds what the format is made of, and is almost entirely internal. `Module/` holds what the format is not about: a TOML reader owes nothing to open-package, and which binary is running is a fact about the process. `Core/` is what every layer compares itself against.
+`Feature/` is the library's whole public face. A runner that acts on a package finds it and loads its manifest itself, and loading refuses what this runner does not support, so no entry point skips either step. `Service/` holds what the format is made of and is internal. `Module/` holds what the format is not about: the TOML reader and which binary is running. `Core/` is what every layer compares against.
 
-Subjects sit side by side rather than nested. A manifest is not part of finding a package, and TOML is not part of a manifest. A concept with its own vocabulary keeps it in its own `Model/`, behaviour sits at the top of its concept, and an error lives where it is raised. That last one is why the version gate and every way a manifest can fail to be read share a file.
+A concept keeps its vocabulary in its own `Model/`, and an error lives where it is raised. The command line is one layer, since the whole target is already the outermost one. `Support/` holds what the surface stands on.
 
-The command line is not layered. That whole target is already this package's outermost layer, and dividing it again would repeat the same four words one level down over files that are all surface. `Support/` holds what the surface stands on, never what it does. Without that line it turns into a drawer.
-
-`Tests/OpenPackageTests` is grouped by subject rather than by layer. The unit suites cover what the runner reads and judges. The command-line suite drives the real binary against real directories, since what this specification promises is about a binary sitting in a directory.
+`Tests/OpenPackageTests` is grouped by subject. The unit suites cover what the runner reads and judges, and the command-line suite drives the real binary against real directories.
 
 ## Development
 
