@@ -11,7 +11,7 @@ import OpenPackage
 /// The same thing the screen shows, in the shape a caller parses rather than reads. The
 /// keys are the manifest's own table names, so a reader who knows `manifest.toml` already
 /// knows this. Which binary wrote it is `Envelope`'s to say.
-struct PackageRecord: EnvelopeRecord {
+struct PackageRecord: Encodable {
     // MARK: - Property
     let openPackage: Compatibility?
     let package: Metadata?

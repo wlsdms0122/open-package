@@ -8,7 +8,7 @@
 /// Why the runner printed nothing else. The cause and the way out are two keys rather than
 /// one paragraph, so a caller matching on what went wrong does not break when the advice
 /// beside it is reworded.
-struct RefusalRecord: EnvelopeRecord {
+struct RefusalRecord: Encodable {
     // MARK: - Property
     let reason: String
     let next: String?

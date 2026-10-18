@@ -7,7 +7,7 @@
 
 /// The summary this runner carries, handed over whole. It stays prose inside the field,
 /// since the normative document has no structure for this surface to mirror.
-struct SpecificationRecord: EnvelopeRecord {
+struct SpecificationRecord: Encodable {
     // MARK: - Property
     let specification: String
 

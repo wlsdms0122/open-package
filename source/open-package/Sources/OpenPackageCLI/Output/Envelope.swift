@@ -7,13 +7,10 @@
 
 import OpenPackage
 
-/// What every JSON line carries whatever it is about: which binary wrote it. The manifest
-/// cannot say that, and a caller needs it before it can judge the rest.
-///
-/// The record's keys go into the same object rather than nested under one, so `runner` is a
-/// key beside them and not a level around them. That is why `EnvelopeRecord` requires a
-/// record to encode as an object.
-struct Envelope<Record: EnvelopeRecord>: Encodable {
+/// A JSON line: the record's keys, and beside them `runner`, the binary that wrote it. The
+/// record must encode as an object, since `JSONEncoder` traps on a keyed container opened
+/// over an array or a single value.
+struct Envelope<Record: Encodable>: Encodable {
     // MARK: - Property
     private let record: Record
 

@@ -44,7 +44,7 @@ struct OutputFormat: ParsableArguments {
 
     // MARK: - Public
     /// Writes one record, in the form that was asked for.
-    func write(_ record: some EnvelopeRecord, render: () -> Void) throws {
+    func write(_ record: some Encodable, render: () -> Void) throws {
         guard json else {
             render()
 
@@ -56,7 +56,7 @@ struct OutputFormat: ParsableArguments {
 
     /// Writes one record where JSON was asked for, and leaves the prose to whoever raised it.
     /// The parser words and prints its own, which is the one output the runner does not.
-    func write(_ record: some EnvelopeRecord) throws {
+    func write(_ record: some Encodable) throws {
         try write(record) { }
     }
 
@@ -96,7 +96,7 @@ struct OutputFormat: ParsableArguments {
     /// Sorted, so two runs of the same question produce identical bytes. Slashes unescaped,
     /// because a command line holds paths and `source\/build.sh` is the same string spelled
     /// in a way nobody reading the output expects.
-    private func writeJSON(_ record: some EnvelopeRecord) throws {
+    private func writeJSON(_ record: some Encodable) throws {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
 

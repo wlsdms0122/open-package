@@ -11,7 +11,7 @@ import ArgumentParser
 /// `OutputFormat` writes it, so which form goes out has one owner rather than one per
 /// command.
 protocol FormattedCommand: ParsableCommand {
-    associatedtype Record: EnvelopeRecord
+    associatedtype Record: Encodable
 
     var format: OutputFormat { get }
 

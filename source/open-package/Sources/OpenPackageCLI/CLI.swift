@@ -37,7 +37,7 @@ struct CLI: FormattedCommand {
                 open-package spec, open-package check
             """,
         version: "open-package \(Environment.version)",
-        subcommands: Registry.builtins
+        subcommands: BuiltinCommand.allCases.map(\.command)
     )
 
     @OptionGroup

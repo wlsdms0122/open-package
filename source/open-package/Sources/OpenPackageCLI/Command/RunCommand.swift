@@ -17,7 +17,7 @@ import OpenPackage
 /// and which words were lost would depend on which runner was holding the package. Here the
 /// manifest is read the same way by anything that can read it, and a name the runner has
 /// taken costs the short form rather than the command.
-struct RunCommand: PassthroughCommand {
+struct RunCommand: ParsableCommand {
     // MARK: - Property
     static let configuration = CommandConfiguration(
         commandName: BuiltinCommand.run.rawValue,
@@ -46,8 +46,7 @@ struct RunCommand: PassthroughCommand {
     @Argument(parsing: .captureForPassthrough, help: "Arguments for that command.")
     private var arguments: [String] = []
 
-    /// Said here and used by the short form too, which is this command written shorter, so
-    /// it names neither spelling.
+    /// Why `--json` is refused for a call to the package's own command, either spelling.
     static let formatUnavailable = "the command's own output passes through, so the runner "
         + "formats nothing here. Ask the command for JSON if it has any."
 
@@ -55,6 +54,10 @@ struct RunCommand: PassthroughCommand {
     init() { }
 
     // MARK: - Public
+    /// Every call by this name is dispatched by `Passthrough` before the parser sees it.
+    func run() throws {
+        throw CallError.undispatched(BuiltinCommand.run.rawValue)
+    }
 
     // MARK: - Private
 }
