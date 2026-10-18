@@ -21,7 +21,7 @@ enum BuiltinCommand: String, CaseIterable, Sendable {
             return "Run one of the package's own commands by name"
 
         case .check:
-            return "Inspect the layout and the manifest"
+            return "Inspect the manifest"
 
         case .spec:
             return "Print the specification"

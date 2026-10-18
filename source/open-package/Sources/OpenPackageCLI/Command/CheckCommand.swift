@@ -13,19 +13,16 @@ struct CheckCommand: FormattedCommand {
     // MARK: - Property
     static let configuration = CommandConfiguration(
         commandName: BuiltinCommand.check.rawValue,
-        abstract: "Inspect the layout and the manifest.",
+        abstract: "Inspect the manifest.",
         discussion: """
-            Reads the package against the specification and nothing else. Whether the package does its job is what its own commands answer, and this only asks whether it is a package.
+            Reads the manifest against the specification and nothing else. The manifest is the whole of what makes a directory a package, so how the rest of the directory is arranged is not read. Whether the package does its job is what its own commands answer.
 
-            An error means the package is malformed and the command leaves with a non-zero status. A warning means a person should look and may legitimately decide to leave it alone, and warnings do not fail the command. Only the manifest can raise an error. What each strength means is `open-package spec`.
+            An error means the package is malformed and the command leaves with a non-zero status. A warning means a person should look and may legitimately decide to leave it alone, and warnings do not fail the command. What each strength means is `open-package spec`.
 
             WHAT IT READS
                 [package] name version      Required
                 [command]                   Empty bodies, and names this runner answers
                                             first, which the short form does not reach
-                README.md                   Reported when absent
-                source/ or document/        Reported when neither is there
-                Top level                   Anything outside the usual shape is reported
                 [package] requires          Reported when a name is not on PATH here
 
             EXAMPLES
@@ -67,7 +64,7 @@ struct CheckCommand: FormattedCommand {
         let diagnosis = inspection.diagnosis
 
         guard !diagnosis.isClean else {
-            Output.write("ok  \(manifest.name) \(manifest.version) has a valid layout and manifest")
+            Output.write("ok  \(manifest.name) \(manifest.version) has a valid manifest")
 
             return
         }
