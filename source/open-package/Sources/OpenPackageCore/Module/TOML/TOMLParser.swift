@@ -1,6 +1,6 @@
 //
 //  TOMLParser.swift
-//  OpenPackage
+//  OpenPackageCore
 //
 //  Created by JSilver on 8/30/26.
 //
@@ -9,13 +9,13 @@ import Foundation
 
 /// The TOML subset `manifest.toml` uses: one level of table headers, with basic strings,
 /// integers, booleans and single-line arrays. Anything else is refused.
-struct TOMLParser: Sendable {
+package struct TOMLParser: Sendable {
     // MARK: - Property
     // MARK: - Initializer
-    init() { }
+    package init() { }
 
     // MARK: - Public
-    func parse(_ source: String) throws -> TOMLDocument {
+    package func parse(_ source: String) throws -> TOMLDocument {
         var entries: [TOMLDocument.Entry] = []
         // Nil before the first header, so a key outside any table is refused, not stored.
         var table: String?
@@ -42,7 +42,7 @@ struct TOMLParser: Sendable {
     }
 
     /// Reads header lines alone, so a source `parse` refuses still names its tables.
-    func tableNames(in source: String) -> [String] {
+    package func tableNames(in source: String) -> [String] {
         lines(of: source).compactMap { line in
             guard line.hasPrefix("["), !line.hasPrefix("[["),
                 let close = line.firstIndex(of: "]")

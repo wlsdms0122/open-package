@@ -60,15 +60,18 @@ struct SpecificationTests {
         }
     }
 
-    @Test("the normative document names the open-package the runner is")
-    func documentNamesItsVersion() throws {
-        // Given, When
-        let sut = try document()
+    @Test("the runner is the version its own package's manifest names")
+    func runnerIsItsManifestsVersion() throws {
+        // Given
+        let manifest = ManifestLoader(
+            url: source.package.appendingPathComponent(Manifest.fileName)
+        )
 
-        // Then section 4 says there is one compatibility axis and no separate specification
-        // number, so a document that names a version the runner never reports would be a
-        // second number by another route.
-        #expect(sut.contains("open-package \(Environment.version)"))
+        // When
+        let sut = try manifest.load()
+
+        // Then
+        #expect(sut.version == "\(Environment.version)")
     }
 
     @Test("the summary the runner carries names the open-package it is a summary of")

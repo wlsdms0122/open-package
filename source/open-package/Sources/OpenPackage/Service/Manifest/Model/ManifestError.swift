@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OpenPackageCore
 
 public enum ManifestError: Error, CustomStringConvertible, Sendable {
     case unreadable(URL, reason: String)
