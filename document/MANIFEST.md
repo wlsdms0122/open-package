@@ -56,7 +56,7 @@ open-package build a.md -o b.html
   → cd <package root> && sh -c 'python3 source/build.py "$@"' build a.md -o b.html
 ```
 
-An argument containing a space stays one argument. The command's exit code becomes the runner's.
+An argument containing a space stays one argument. The runner becomes the command, so the command's exit code, or the signal that ended it, is the runner's.
 
 Appending works for a line that is one invocation. For a pipeline or a sequence the end of the line is not where arguments go:
 
