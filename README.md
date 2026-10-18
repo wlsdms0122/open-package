@@ -61,7 +61,7 @@ open-package new my-package
 | `source/build.sh` | Builds the runner and leaves it at `.build/open-package` |
 | `source/install.sh` | Puts a released runner on a machine |
 
-The Swift package is a library and a command line over it:
+The Swift package is a library and a command line over it, on a smaller library that the build also reads the manifest with:
 
 ```
 Sources/OpenPackage/
@@ -71,10 +71,17 @@ Sources/OpenPackage/
     Package/            finding the package around a place
     Manifest/           what a package declares, and loading it
   Module/
-    TOML/               the subset a manifest is written in
     Environment.swift   what this binary is, and which packages it supports
+
+Sources/OpenPackageCore/
+  Module/
+    TOML/               the subset a manifest is written in
   Core/
     Version.swift       the versions everything here is compared by
+
+Plugins/PackageVersion/ gives OpenPackage `packageVersion` at every build
+Sources/PackageVersionTool/
+                        reads it from this package's `[package] version`, with OpenPackageCore
 
 Sources/OpenPackageCLI/
   CLI.swift             the entry point, the manual, and the one fork
@@ -92,7 +99,9 @@ Sources/OpenPackageCLI/
 
 A built-in either states its result in both forms at once, or, like `run`, passes the package's own output through. `BuiltinCommand` maps each name the runner has taken to the command that answers it in one switch.
 
-`Feature/` is the library's whole public face. A runner that acts on a package finds it and loads its manifest itself, and loading refuses what this runner does not support, so no entry point skips either step. `Service/` holds what the format is made of and is internal. `Module/` holds what the format is not about: the TOML reader and which binary is running. `Core/` is what every layer compares against.
+`Feature/` is the library's whole public face. A runner that acts on a package finds it and loads its manifest itself, and loading refuses what this runner does not support, so no entry point skips either step. `Service/` holds what the format is made of and is internal. `Module/` holds what the format is not about: which binary is running.
+
+`OpenPackageCore` holds what the format is not about, the TOML reader, and what every layer compares against, `Version`. It is a target of its own so the build reads this package's manifest the way the runner reads every manifest: `PackageVersionTool` takes `[package] version` with the same reader and the same `Version`, and the `PackageVersion` plugin runs it so `Environment` reports that version. Nothing in the source repeats it.
 
 A concept keeps its vocabulary in its own `Model/`, and an error lives where it is raised. The command line is one layer, since the whole target is already the outermost one. `Support/` holds what the surface stands on.
 
@@ -117,4 +126,4 @@ sh source/build.sh          # writes .build/open-package
 
 Either way `open-package build` leaves its result at `.build/open-package`. `.build/` is ignored by git, since it is what this repository produces rather than what it holds.
 
-Releasing is `open-package build`, then attaching `.build/open-package` to a GitHub release named after the **runner** version, under exactly that filename. `install.sh` fetches `releases/latest/download/open-package`, so a renamed asset is a 404.
+Releasing is raising `[package] version` in `manifest.toml`, running `open-package build`, then attaching `.build/open-package` to a GitHub release named after the **runner** version, under exactly that filename. `install.sh` fetches `releases/latest/download/open-package`, so a renamed asset is a 404.
