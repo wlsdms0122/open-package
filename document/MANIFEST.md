@@ -2,7 +2,7 @@
 
 The normative text is [`SPEC.md`](SPEC.md). This document is the field reference and the parser's contract, and where the two disagree, `SPEC.md` wins.
 
-`manifest.toml` is what makes a directory a package. It says which open-package the package is written for, what the package is, and what it can run.
+`manifest.toml` is what makes a directory a package, and the `[open-package]` table is what makes the file a package's manifest. It says which open-package the package is written for, what the package is, and what it can run.
 
 ```toml
 # The specification is `open-package spec`
@@ -27,6 +27,8 @@ verify = "sh source/verify.sh"
 | Key | | What it says |
 |---|---|---|
 | `version` | **required** | The open-package this package is written for |
+
+The table itself is the declaration. A `manifest.toml` without it is not a package's manifest, and the runner looks past it.
 
 Write the least version whose behaviour the package needs, not the version of the runner that wrote the file. Section 4 of `SPEC.md` says which runners then support the package.
 
@@ -84,7 +86,7 @@ COMMANDS
     build     python3 source/build.py
 ```
 
-That listing is the command itself, so it cannot describe the command wrongly. `README.md` is where a package describes itself at length. A name carries no meaning the manifest has not written down, since `SPEC.md` fixes none of them.
+That listing is the command itself, so it cannot describe the command wrongly. Describing itself at length is up to the package, in whatever files it chooses. A name carries no meaning the manifest has not written down, since `SPEC.md` fixes none of them.
 
 ## The environment
 
@@ -94,7 +96,7 @@ There is no `[env]` table. A command inherits the caller's environment untouched
 SAMPLE_MIRROR=https://mirror.internal open-package fetch
 ```
 
-Defaults belong to the script that reads the value. A package that looks at a variable names it in its `README.md`.
+Defaults belong to the script that reads the value. A package that looks at a variable names it where the package describes itself.
 
 ## What the parser reads
 

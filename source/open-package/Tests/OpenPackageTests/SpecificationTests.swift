@@ -80,21 +80,15 @@ struct SpecificationTests {
         #expect(sut.contains("\(Environment.version)"))
     }
 
-    @Test("the layout is the same four entries in the document, the summary and the code")
-    func layoutIsTheSameEverywhere() throws {
-        // Given the tree is drawn twice in prose and held once as constants, and nothing
-        // compiles the drawings. An entry added to one of them and nowhere else is a
-        // package told to carry something no runner will allow at its top level.
-        let expected: Set<String> = [
-            PackageLayout.manifest,
-            PackageLayout.readme,
-            "\(PackageLayout.source)/",
-            "\(PackageLayout.document)/"
-        ]
+    @Test("the document and the summary name the table that makes a manifest a package")
+    func declarationIsTheSameEverywhere() throws {
+        // Given the runner tells a package's manifest from any other manifest.toml by one
+        // table, and nothing compiles the prose that tells a person which.
+        let declaration = "\(PackageLayout.manifest) that opens an [\(Manifest.declaration)] table"
 
         // When, Then
-        #expect(entries(inTreeOf: try document()) == expected)
-        #expect(entries(inTreeOf: Specification.summary) == expected)
+        #expect(try document().replacingOccurrences(of: "`", with: "").contains(declaration))
+        #expect(Specification.summary.contains(declaration))
     }
 
     @Test("the summary states the rule that decides where arguments land")
@@ -112,30 +106,6 @@ struct SpecificationTests {
             contentsOf: source.package.appendingPathComponent("document/SPEC.md"),
             encoding: .utf8
         )
-    }
-
-    /// The names drawn in a layout tree: the lines under `<package>/` that sit one level in,
-    /// read down to the first blank line or fence. A continuation line is indented past the
-    /// name column, so it falls outside.
-    private func entries(inTreeOf text: String) -> Set<String> {
-        let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-
-        guard let root = lines.firstIndex(where: { $0.trimmingCharacters(in: .whitespaces) == "<package>/" })
-        else { return [] }
-
-        let column = indent(of: lines[root]) + 2
-
-        return Set(
-            lines[(root + 1)...]
-                .prefix { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
-                .prefix { $0.trimmingCharacters(in: .whitespaces) != "```" }
-                .filter { indent(of: $0) == column }
-                .compactMap { $0.split(separator: " ").first.map(String.init) }
-        )
-    }
-
-    private func indent(of line: String) -> Int {
-        line.prefix { $0 == " " }.count
     }
 
     /// The names in the first column of the table that follows a heading, up to the next one.
