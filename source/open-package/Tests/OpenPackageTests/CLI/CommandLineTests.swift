@@ -687,6 +687,42 @@ struct CommandLineTests {
         #expect(placed.standardOutput == "given\ntwo\n", "\(placed.output)")
     }
 
+    @Test("a command is the process its caller started, so it owns the caller's terminal")
+    func becomesTheProcessItsCallerStarted() throws {
+        // Given a command that names its own process.
+        let package = try bundled("good", manifest: .manifest(
+            named: "good",
+            commands: #"""
+                identify = "echo $$"
+                verify = "true"
+                """#
+        ))
+
+        // When
+        let result = run(package, "identify")
+
+        // Then
+        #expect(result.standardOutput == "\(result.processIdentifier)\n", "\(result.output)")
+    }
+
+    @Test("a command ended by a signal ends the runner by the same signal")
+    func endsByTheCommandsSignal() throws {
+        // Given
+        let package = try bundled("good", manifest: .manifest(
+            named: "good",
+            commands: #"""
+                killed = "kill -TERM $$"
+                verify = "true"
+                """#
+        ))
+
+        // When
+        let result = run(package, "killed")
+
+        // Then
+        #expect(result.signaled && result.status == SIGTERM, "\(result.output)")
+    }
+
     @Test("a manifest that cannot be read says so rather than reporting no package")
     func reportsAnUnreadableManifest() throws {
         // Given
