@@ -5,14 +5,13 @@
 //  Created by JSilver on 8/30/26.
 //
 
-/// What a package declares about itself. Where it will be placed, and when to reach for
-/// it, are the receiving side's knowledge and deliberately absent.
 public struct Manifest: Sendable {
     // MARK: - Property
+    public static let fileName = "manifest.toml"
+    static let declaration = "open-package"
+
     public let requiredRunner: Version
-    /// What the package calls itself. Not an identifier: which package this is, is the
-    /// directory it is in, and a second copy of that in the manifest would be a fact that
-    /// can drift from the one that decided it.
+    /// Not an identifier: a package's identity is its directory.
     public let name: String
     public let version: String
     public let summary: String
@@ -20,15 +19,10 @@ public struct Manifest: Sendable {
     public let commands: [Command]
 
     // MARK: - Initializer
-    /// A field written as something other than a string is refused, not rendered as one. A
-    /// missing field is left empty instead, since whether it had to be there is the
-    /// specification's question and `check` is where it is asked.
-    ///
-    /// `[open-package] version` is the exception and is read as a version here. It decides
-    /// whether the rest may be read at all, so a manifest that cannot say which open-package
-    /// it is written for is not one yet.
+    /// Missing fields are left empty for `check` to judge. `[open-package] version` is
+    /// required here, since it decides whether the rest may be read.
     init(document: TOMLDocument) throws {
-        guard let declared = try document.string("open-package.version") else {
+        guard let declared = try document.string("\(Self.declaration).version") else {
             throw ManifestError.undeclaredRunnerVersion
         }
         guard let required = Version(declared) else {
@@ -58,8 +52,6 @@ public struct Manifest: Sendable {
 }
 
 public extension Manifest {
-    /// A command as the manifest states it: the name it is called by, and the line that
-    /// runs.
     struct Command: Equatable, Sendable {
         // MARK: - Property
         public let name: String

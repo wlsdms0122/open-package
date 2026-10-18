@@ -25,12 +25,11 @@ public struct Version: Equatable, Comparable, CustomStringConvertible, Sendable 
 
         guard (1...3).contains(parts.count) else { return nil }
 
-        // Digits only. `Int("+1")` succeeds, and a version has one written form. A second
-        // spelling of the same number puts two names on one compatibility axis.
+        // Digits only: `Int("+1")` would accept a second spelling of the same version.
         guard parts.allSatisfy({ !$0.isEmpty && $0.allSatisfy(\.isNumber) }) else { return nil }
 
         let numbers = parts.compactMap(Int.init)
-        guard numbers.count == parts.count, numbers.allSatisfy({ $0 >= 0 }) else { return nil }
+        guard numbers.count == parts.count else { return nil }
 
         self.init(
             major: numbers[0],

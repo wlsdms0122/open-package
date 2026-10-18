@@ -7,11 +7,8 @@
 
 import Foundation
 
-/// As much TOML as `manifest.toml` uses: one level of table headers, and basic strings,
-/// integers, booleans and single-line arrays under them. Multi-line strings, inline tables,
-/// arrays of tables, nested and quoted names, keys outside any table, and dates are refused.
-/// Supporting a shape halfway leaves a place where a manifest is read differently than it
-/// looks, and a shape read as some other shape is worse than one turned away.
+/// The TOML subset `manifest.toml` uses: one level of table headers, with basic strings,
+/// integers, booleans and single-line arrays. Anything else is refused.
 struct TOMLParser: Sendable {
     // MARK: - Property
     // MARK: - Initializer
@@ -20,20 +17,11 @@ struct TOMLParser: Sendable {
     // MARK: - Public
     func parse(_ source: String) throws -> TOMLDocument {
         var entries: [TOMLDocument.Entry] = []
-        // Nil until a header is read, rather than an empty string standing in for "no table
-        // yet". A key written before any header is legal TOML, and holding it under a name
-        // nothing looks up would let a line of a manifest do nothing without saying so.
+        // Nil before the first header, so a key outside any table is refused, not stored.
         var table: String?
 
-        // Split on newline characters, not on `CharacterSet.newlines`: that set sees CR and
-        // LF as two separators, so a CRLF file gains an empty line between every real one
-        // and every reported number drifts further from the file a person is looking at.
-        // A Character is the right unit here, since Swift already reads "\r\n" as one.
-        let lines = source.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
-
-        for (offset, rawLine) in lines.enumerated() {
+        for (offset, line) in lines(of: source).enumerated() {
             let number = offset + 1
-            let line = rawLine.trimmingCharacters(in: .whitespaces)
 
             if line.isEmpty || line.hasPrefix("#") { continue }
 
@@ -53,11 +41,34 @@ struct TOMLParser: Sendable {
         return TOMLDocument(entries: entries)
     }
 
+    /// Reads header lines alone, so a source `parse` refuses still names its tables.
+    func tableNames(in source: String) -> [String] {
+        lines(of: source).compactMap { line in
+            guard line.hasPrefix("["), !line.hasPrefix("[["),
+                let close = line.firstIndex(of: "]")
+            else { return nil }
+
+            let name = line[line.index(after: line.startIndex)..<close].trimmingCharacters(in: .whitespaces)
+            let quotes: Set<Character> = ["\"", "'"]
+            guard name.count >= 2, let first = name.first, first == name.last, quotes.contains(first) else {
+                return name
+            }
+
+            return String(name.dropFirst().dropLast())
+        }
+    }
+
     // MARK: - Private
+    /// Splits on `Character.isNewline`, not `CharacterSet.newlines`, which splits CRLF in two
+    /// and skews every reported line number.
+    private func lines(of source: String) -> [String] {
+        source
+            .split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+    }
+
     private func header(_ line: String, at number: Int) throws -> String {
-        // Caught before the brackets come off, because `[[command]]` loses one pair to the
-        // same dropFirst/dropLast a plain header uses and would arrive below as a table
-        // named `[command]`: a name nothing reads, so its commands go missing in silence.
+        // Checked before stripping brackets, or `[[command]]` becomes a table named `[command]`.
         guard !line.hasPrefix("[[") else {
             throw TOMLError(line: number, reason: "an array of tables is not read here")
         }
@@ -77,9 +88,7 @@ struct TOMLParser: Sendable {
         return name
     }
 
-    /// What TOML calls a bare name: the shape this subset can both read and write back. A
-    /// name outside it is either a shape that is not here, or a quoting this parser does not
-    /// read, and taking it either way stores an entry under a name nothing looks up.
+    /// Only bare names; anything else would be stored under a key nothing looks up.
     private func bare(_ name: String, _ role: String, at number: Int) throws {
         guard name.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_" || $0 == "-") }) else {
             throw TOMLError(line: number, reason: "'\(name)' is not a \(role)")
@@ -100,10 +109,7 @@ struct TOMLParser: Sendable {
             throw TOMLError(line: number, reason: "empty key")
         }
 
-        // A dotted key is how TOML writes a table without a header. Entries are stored as
-        // `table.key`, so accepting one would let `open-package.version = "1.0.0"` at the top
-        // of a file mean what the `[open-package]` table means. That is a second way to say one
-        // thing, which is exactly what this parser refuses to have.
+        // A dotted key would be a second way to write a table.
         guard !key.contains(".") else {
             throw TOMLError(line: number, reason: "'\(key)' is a dotted key; write a [table] header")
         }

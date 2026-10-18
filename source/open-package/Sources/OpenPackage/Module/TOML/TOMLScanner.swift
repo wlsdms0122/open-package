@@ -5,8 +5,8 @@
 //  Created by JSilver on 8/30/26.
 //
 
-/// Reads one value from the right-hand side of an assignment. A `#` opens a comment only
-/// outside a string, so `version = "1.0.0"  # note` keeps its value clean.
+/// Reads one value from the right-hand side of an assignment. `#` starts a comment only
+/// outside a string.
 struct TOMLScanner {
     // MARK: - Property
     private let characters: [Character]

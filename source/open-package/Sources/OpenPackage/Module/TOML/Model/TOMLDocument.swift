@@ -5,8 +5,7 @@
 //  Created by JSilver on 8/30/26.
 //
 
-/// Parsed entries keyed as `table.key`, in the order the file states them. The order of
-/// `[command]` is the order a reader sees in the command list, so it is part of the data.
+/// Entries keyed as `table.key`, in file order, which is the order commands are listed in.
 struct TOMLDocument: Sendable {
     // MARK: - Property
     let entries: [Entry]
@@ -17,9 +16,7 @@ struct TOMLDocument: Sendable {
     }
 
     // MARK: - Public
-    /// The string at `key`, or `nil` when there is none. A value of another type is refused
-    /// rather than rendered: `version = 1` is not `"1"`, and reading it as one would let a
-    /// shape the scanner already rejects back in through another door.
+    /// Throws on a non-string value rather than rendering it: `version = 1` is not `"1"`.
     func string(_ key: String) throws -> String? {
         guard let entry = entry(key) else { return nil }
         guard case let .string(text) = entry.value else {
@@ -69,8 +66,7 @@ extension TOMLDocument {
         // MARK: - Property
         let key: String
         let value: TOMLValue
-        /// Where it was written. Every refusal names a line, and one raised after parsing
-        /// has to be able to point at the same place the parser would have.
+        /// Kept so errors raised after parsing can name the line.
         let line: Int
 
         // MARK: - Initializer

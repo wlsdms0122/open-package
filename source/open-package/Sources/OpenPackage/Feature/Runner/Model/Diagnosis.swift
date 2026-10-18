@@ -5,8 +5,7 @@
 //  Created by JSilver on 8/30/26.
 //
 
-/// The result of inspecting a package. An error means the package is malformed; a warning
-/// means a person should look, and may legitimately decide to leave it.
+/// Errors make a package invalid; warnings do not.
 public struct Diagnosis: Sendable {
     // MARK: - Property
     public private(set) var errors: [String] = []

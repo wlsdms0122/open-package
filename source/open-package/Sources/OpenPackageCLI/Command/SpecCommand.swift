@@ -31,7 +31,7 @@ struct SpecCommand: FormattedCommand {
     // MARK: - Initializer
     // MARK: - Public
     func execute() throws -> CommandResult<SpecificationRecord> {
-        let specification = SpecificationRunner().run()
+        let specification = Specification.summary
 
         return CommandResult(SpecificationRecord(specification: specification)) {
             Output.write(specification)

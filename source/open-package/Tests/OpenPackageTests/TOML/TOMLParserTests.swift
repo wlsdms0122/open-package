@@ -188,5 +188,24 @@ struct TOMLParserTests {
         #expect(error?.line == 4)
     }
 
+    @Test("a source names its tables even where the rest of it is refused")
+    func namesTablesOfARefusedSource() {
+        // Given a body the parser refuses, and headers written as TOML allows but this subset
+        // does not read.
+        let source = """
+            [open-package]  # declared
+            version = 1.0.0
+
+            [[bin]]
+            name = "tool"
+
+            [ "package" ]
+            ['command']
+            """
+
+        // When, Then
+        #expect(sut.tableNames(in: source) == ["open-package", "package", "command"])
+    }
+
     // MARK: - Private
 }
