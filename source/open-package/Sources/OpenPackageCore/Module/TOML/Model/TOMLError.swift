@@ -1,6 +1,6 @@
 //
 //  TOMLError.swift
-//  OpenPackage
+//  OpenPackageCore
 //
 //  Created by JSilver on 8/30/26.
 //
@@ -15,7 +15,7 @@ public struct TOMLError: Error, Equatable, CustomStringConvertible, Sendable {
     }
 
     // MARK: - Initializer
-    init(line: Int, reason: String) {
+    package init(line: Int, reason: String) {
         self.line = line
         self.reason = reason
     }

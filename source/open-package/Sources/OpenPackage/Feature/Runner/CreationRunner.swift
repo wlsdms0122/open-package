@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OpenPackageCore
 
 /// A missing directory is made; an existing one becomes a package as it stands.
 public struct CreationRunner: Sendable {

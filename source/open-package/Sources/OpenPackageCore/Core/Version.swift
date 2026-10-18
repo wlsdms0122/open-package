@@ -1,6 +1,6 @@
 //
 //  Version.swift
-//  OpenPackage
+//  OpenPackageCore
 //
 //  Created by JSilver on 8/30/26.
 //
@@ -14,13 +14,13 @@ public struct Version: Equatable, Comparable, CustomStringConvertible, Sendable 
     public var description: String { "\(major).\(minor).\(patch)" }
 
     // MARK: - Initializer
-    init(major: Int, minor: Int = 0, patch: Int = 0) {
+    package init(major: Int, minor: Int = 0, patch: Int = 0) {
         self.major = major
         self.minor = minor
         self.patch = patch
     }
 
-    init?(_ text: String) {
+    package init?(_ text: String) {
         let parts = text.split(separator: ".", omittingEmptySubsequences: false).map(String.init)
 
         guard (1...3).contains(parts.count) else { return nil }

@@ -8,6 +8,7 @@
 import Testing
 
 @testable import OpenPackage
+@testable import OpenPackageCore
 
 @Suite("ManifestLoader Tests")
 struct ManifestLoaderTests {

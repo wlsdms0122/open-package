@@ -1,6 +1,6 @@
 # The open-package specification
 
-**open-package 1.2.1.** This document is normative. The runner carries a summary of it and prints that with `open-package spec`. If the two disagree, this one is right.
+This document is normative, and its version is this package's `[package] version` in `manifest.toml`. The runner carries a summary of it and prints that with `open-package spec`. If the two disagree, this one is right.
 
 Rules come at three strengths. **Required** means a directory that breaks it is not an open-package. **Expected** means there are real exceptions, and a person can look at one and decide to leave it alone. **Allowed** covers the rest. Anything this document does not mention is free.
 
@@ -123,7 +123,7 @@ Adding something is a minor bump. Packages that want it declare the version that
 The move is:
 
 1. Update this document, and `Specification.summary` in the runner
-2. Raise `Environment.version`, then `open-package build`
+2. Raise `[package] version` in this package's `manifest.toml`, then `open-package build`
 3. Publish the new runner
 4. Raise `[open-package] version` in the packages that need the change
 

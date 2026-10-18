@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OpenPackageCore
 
 struct ManifestLoader: Sendable {
     // MARK: - Property

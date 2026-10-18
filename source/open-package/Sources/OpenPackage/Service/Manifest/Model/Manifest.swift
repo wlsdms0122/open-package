@@ -5,6 +5,8 @@
 //  Created by JSilver on 8/30/26.
 //
 
+import OpenPackageCore
+
 public struct Manifest: Sendable {
     // MARK: - Property
     public static let fileName = "manifest.toml"
