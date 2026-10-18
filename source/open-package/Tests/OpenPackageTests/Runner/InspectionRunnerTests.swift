@@ -1,5 +1,5 @@
 //
-//  PackageInspectorTests.swift
+//  InspectionRunnerTests.swift
 //  OpenPackageTests
 //
 //  Created by JSilver on 8/30/26.
@@ -10,8 +10,8 @@ import Testing
 
 @testable import OpenPackage
 
-@Suite("PackageInspector Tests")
-struct PackageInspectorTests {
+@Suite("InspectionRunner Tests")
+struct InspectionRunnerTests {
     // MARK: - Property
     private let workspace = Workspace()
 
@@ -133,6 +133,6 @@ struct PackageInspectorTests {
 
     // MARK: - Private
     private func inspect(_ root: URL) throws -> Diagnosis {
-        PackageInspector(manifest: try PackageDirectory(root: root).manifest()).inspect()
+        try InspectionRunner(origin: root).run().diagnosis
     }
 }

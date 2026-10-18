@@ -5,10 +5,10 @@
 //  Created by JSilver on 8/30/26.
 //
 
-/// The summary that travels inside every package. `document/SPEC.md` in the open-package
-/// repository is the normative text; where the two disagree, that document wins.
-enum Specification {
-    static var summary: String {
+/// The summary every runner carries. `document/SPEC.md` is the normative text, and wins
+/// where the two disagree.
+public enum Specification {
+    public static var summary: String {
         """
         open-package \(Environment.version), a package specification that is neutral about language and consumer
 
@@ -46,6 +46,4 @@ enum Specification {
             4. What the package offers is already runnable. The receiving side is never asked to build it, so a compiled language ships its build product
         """
     }
-
-    // MARK: - Private
 }

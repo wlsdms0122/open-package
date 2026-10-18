@@ -1,5 +1,5 @@
 //
-//  PackageFactoryTests.swift
+//  CreationRunnerTests.swift
 //  OpenPackageTests
 //
 //  Created by JSilver on 8/30/26.
@@ -10,8 +10,8 @@ import Testing
 
 @testable import OpenPackage
 
-@Suite("PackageFactory Tests")
-struct PackageFactoryTests {
+@Suite("CreationRunner Tests")
+struct CreationRunnerTests {
     // MARK: - Property
     private let workspace = Workspace()
 
@@ -23,7 +23,7 @@ struct PackageFactoryTests {
         let destination = workspace.path("created")
 
         // When
-        let identifier = try PackageFactory().create(at: destination)
+        let identifier = try CreationRunner().run(at: destination)
 
         // Then
         #expect(identifier == "created")
@@ -31,21 +31,20 @@ struct PackageFactoryTests {
         #expect(try FileManager.default.contentsOfDirectory(atPath: destination.path) == [Manifest.fileName])
     }
 
-    @Test("the skeleton it writes is a package the inspector accepts")
+    @Test("the manifest it writes is one the inspection accepts")
     func writesValidPackage() throws {
         // Given
         let destination = workspace.path("created")
 
         // When
-        try PackageFactory().create(at: destination)
+        try CreationRunner().run(at: destination)
 
         // Then
-        let directory = PackageDirectory(root: destination)
-        let manifest = try directory.manifest()
+        let inspection = try InspectionRunner(origin: destination).run()
 
-        #expect(manifest.name == "created")
-        #expect(manifest.command(named: "verify") != nil)
-        #expect(PackageInspector(manifest: manifest).inspect().isValid)
+        #expect(inspection.manifest.name == "created")
+        #expect(inspection.manifest.command(named: "verify") != nil)
+        #expect(inspection.diagnosis.isValid)
     }
 
     @Test("an existing directory becomes a package as it stands")
@@ -56,7 +55,7 @@ struct PackageFactoryTests {
         try "".write(to: destination.appendingPathComponent("tool.py"), atomically: true, encoding: .utf8)
 
         // When
-        try PackageFactory().create(at: destination)
+        try CreationRunner().run(at: destination)
 
         // Then
         let entries = try FileManager.default.contentsOfDirectory(atPath: destination.path).sorted()
@@ -77,7 +76,7 @@ struct PackageFactoryTests {
 
         // When, Then
         #expect(throws: PackageError.self) {
-            try PackageFactory().create(at: destination)
+            try CreationRunner().run(at: destination)
         }
         #expect(
             try String(contentsOf: destination.appendingPathComponent(Manifest.fileName), encoding: .utf8)
@@ -93,7 +92,7 @@ struct PackageFactoryTests {
 
         // When, Then
         #expect(throws: PackageError.self) {
-            try PackageFactory().create(at: destination)
+            try CreationRunner().run(at: destination)
         }
     }
 

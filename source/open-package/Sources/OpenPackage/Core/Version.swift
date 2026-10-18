@@ -30,7 +30,7 @@ public struct Version: Equatable, Comparable, CustomStringConvertible, Sendable 
         guard parts.allSatisfy({ !$0.isEmpty && $0.allSatisfy(\.isNumber) }) else { return nil }
 
         let numbers = parts.compactMap(Int.init)
-        guard numbers.count == parts.count, numbers.allSatisfy({ $0 >= 0 }) else { return nil }
+        guard numbers.count == parts.count else { return nil }
 
         self.init(
             major: numbers[0],

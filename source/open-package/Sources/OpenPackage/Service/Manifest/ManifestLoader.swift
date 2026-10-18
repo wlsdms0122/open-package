@@ -29,6 +29,8 @@ struct ManifestLoader: Sendable {
         return TOMLParser().tableNames(in: source).contains(Manifest.declaration) ? .declared : .foreign
     }
 
+    /// The manifest, refused unless this runner supports the version it asks for. A manifest
+    /// written for a version this binary does not have would be read as something else.
     func load() throws -> Manifest {
         let source: String
         do {
@@ -37,18 +39,12 @@ struct ManifestLoader: Sendable {
             throw ManifestError.unreadable(url, reason: error.localizedDescription)
         }
 
+        let manifest: Manifest
         do {
-            return try Manifest(document: try TOMLParser().parse(source))
+            manifest = try Manifest(document: try TOMLParser().parse(source))
         } catch let error as TOMLError {
             throw ManifestError.malformed(error)
         }
-    }
-
-    /// The same, refused unless this runner supports the version it asks for. Reading a
-    /// manifest written for a version this binary does not have quietly does something other
-    /// than what it says, so the gate is here rather than at whoever asked.
-    func loadSupported() throws -> Manifest {
-        let manifest = try load()
 
         guard Self.supports(manifest.requiredRunner) else {
             throw ManifestError.unsupportedRunnerVersion(required: manifest.requiredRunner)
